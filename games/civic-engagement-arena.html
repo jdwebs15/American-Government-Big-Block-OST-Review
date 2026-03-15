@@ -37,7 +37,7 @@
     .subtitle{color:var(--muted);line-height:1.45;margin:0}
     .topbar{
       display:grid;
-      grid-template-columns:1.35fr repeat(5, minmax(110px,1fr));
+      grid-template-columns:1.5fr repeat(4, minmax(110px,1fr));
       gap:10px;
       padding:14px;
       margin-bottom:16px;
@@ -116,6 +116,7 @@
       background:rgba(255,255,255,.04);color:var(--text);border-radius:14px;
       padding:14px 14px 14px 48px;position:relative;font-weight:700;
       box-shadow:none;
+      transition:background .15s ease, border-color .15s ease, transform .08s ease;
     }
     .choice::before{
       content:attr(data-letter);
@@ -125,15 +126,17 @@
       display:grid;place-items:center;color:#dce7ff;font-size:.82rem;font-weight:900;
     }
     .choice:hover{background:rgba(255,255,255,.07)}
+    .choice:active{transform:translateY(1px)}
     .choice.correct{border-color:rgba(43,213,118,.45);background:rgba(43,213,118,.12)}
     .choice.incorrect{border-color:rgba(255,92,122,.45);background:rgba(255,92,122,.12)}
+    .choice.dimmed{opacity:.5}
     .feedback{
       margin-top:14px;border-radius:14px;padding:14px;border:1px solid var(--line);
       background:rgba(255,255,255,.04);display:none
     }
     .feedback.show{display:block}
     .feedback.good{border-color:rgba(43,213,118,.35);background:rgba(43,213,118,.10)}
-    .feedback.bad{border-color:rgba(255,92,122,.35);background:rgba(255,92,122,.10)}
+    .feedback.bad{border-color:rgba(255,209,102,.35);background:rgba(255,209,102,.10)}
     .feedback .lead{font-weight:900;margin-bottom:6px}
     .feedback .hint{color:#fff3c7}
     .sideTitle{font-size:1rem;font-weight:900;margin:0 0 8px}
@@ -155,7 +158,7 @@
     .footBtns{display:flex;gap:10px;flex-wrap:wrap;margin-top:14px}
     .results{padding:24px}
     .scoreBig{font-size:clamp(2rem,5vw,3rem);font-weight:1000;line-height:1;margin:4px 0 8px}
-    .resultGrid{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin-top:16px}
+    .resultGrid{display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin-top:16px}
     .resultBox{
       border:1px solid var(--line);border-radius:16px;padding:14px;background:rgba(255,255,255,.04)
     }
@@ -210,15 +213,14 @@
           </div>
 
           <div class="card" style="margin-top:14px">
-            <div class="label">Class Card</div>
+            <div class="label">Student Sign In</div>
             <input id="studentName" class="input" type="text" placeholder="Student name" maxlength="40" />
-            <input id="classCard" class="input" type="text" placeholder="Class card / period" maxlength="40" />
             <div class="chips">
               <span class="chip">30 questions</span>
               <span class="chip">Shuffled order</span>
               <span class="chip">Shuffled answers</span>
-              <span class="chip">Hints only</span>
-              <span class="chip">Mastery flow</span>
+              <span class="chip">Hint on miss</span>
+              <span class="chip">Auto-advance on correct</span>
             </div>
             <div class="footBtns">
               <button id="startBtn">Start Game</button>
@@ -232,10 +234,10 @@
             <h2 class="sideTitle">How it works</h2>
             <ul>
               <li>Read each scenario carefully.</li>
-              <li>Select the best answer.</li>
-              <li>If you miss one, you will get a <strong>hint</strong> and explanation.</li>
+              <li>If you answer correctly, the game auto-advances.</li>
+              <li>If you miss, you get a hint and must choose again.</li>
               <li>The hint points you toward the concept, but does <strong>not</strong> hand you the answer.</li>
-              <li>Your progress, accuracy, timer, and class card stay visible during the game.</li>
+              <li>Progress, accuracy, timer, and started time stay visible during the game.</li>
             </ul>
           </div>
 
@@ -258,10 +260,6 @@
         <div class="stat studentCard">
           <div class="k">Student</div>
           <div class="v" id="tbStudent">—</div>
-        </div>
-        <div class="stat">
-          <div class="k">Class Card</div>
-          <div class="v" id="tbClass">—</div>
         </div>
         <div class="stat">
           <div class="k">Progress</div>
@@ -304,9 +302,10 @@
             <div class="label">Rules</div>
             <ul class="mini" style="margin:8px 0 0 18px;padding:0">
               <li>One best answer per question.</li>
-              <li>Use the hint only after you have committed to a choice.</li>
+              <li>On a miss, a hint appears and you choose again.</li>
+              <li>Auto-advance happens only after the correct answer.</li>
               <li>Questions and answer choices are shuffled each new run.</li>
-              <li>Restart is available if you want a fresh mastery attempt.</li>
+              <li>Restart is available for a fresh mastery attempt.</li>
             </ul>
           </div>
 
@@ -335,10 +334,6 @@
               <div id="fbExplain"></div>
               <div class="hint" id="fbHint" style="margin-top:8px"></div>
             </div>
-
-            <div class="footBtns">
-              <button id="nextBtn" class="good" disabled>Next Question</button>
-            </div>
           </div>
         </main>
       </div>
@@ -355,10 +350,6 @@
           <div class="resultBox">
             <div class="label">Student</div>
             <div class="gameName" id="resStudent">—</div>
-          </div>
-          <div class="resultBox">
-            <div class="label">Class Card</div>
-            <div class="gameName" id="resClass">—</div>
           </div>
           <div class="resultBox">
             <div class="label">Accuracy</div>
@@ -400,7 +391,8 @@
     const GAME_TITLE = "Civic Engagement Arena";
     const GAME_FILE_NAME = "civic-engagement-arena.html";
     const TOTAL_QUESTIONS = 30;
-    const STORAGE_KEY = "gov_ost_civic_engagement_arena_v1";
+    const STORAGE_KEY = "gov_ost_civic_engagement_arena_v2";
+    const AUTO_ADVANCE_DELAY = 700;
 
     const QUESTION_BANK = [
       {
@@ -839,7 +831,6 @@
       }
     ];
 
-    // ---------- utility ----------
     const $ = sel => document.querySelector(sel);
 
     function shuffleArray(arr){
@@ -878,10 +869,8 @@
       window.location.href = "../index.html";
     }
 
-    // ---------- state ----------
     let state = {
       student:"",
-      classCard:"",
       startedAt:"",
       questionSet:[],
       index:0,
@@ -889,25 +878,24 @@
       answered:0,
       misses:[],
       answeredCurrent:false,
+      attemptsOnCurrent:0,
       timerSec:0,
-      timerId:null
+      timerId:null,
+      autoAdvanceId:null
     };
 
     function buildQuestionSet(){
-      const picked = shuffleArray(QUESTION_BANK).slice(0, TOTAL_QUESTIONS).map(q => {
-        const shuffledChoices = shuffleArray(q.choices);
-        return {
-          ...q,
-          shuffledChoices
-        };
-      });
-      return picked;
+      return shuffleArray(QUESTION_BANK).slice(0, TOTAL_QUESTIONS).map(q => ({
+        ...q,
+        shuffledChoices: shuffleArray(q.choices)
+      }));
     }
 
     function saveState(){
       const safe = {
         ...state,
-        timerId:null
+        timerId:null,
+        autoAdvanceId:null
       };
       localStorage.setItem(STORAGE_KEY, JSON.stringify(safe));
     }
@@ -938,6 +926,8 @@
     function stopTimer(){
       if(state.timerId) clearInterval(state.timerId);
       state.timerId = null;
+      if(state.autoAdvanceId) clearTimeout(state.autoAdvanceId);
+      state.autoAdvanceId = null;
     }
 
     function showScreen(id){
@@ -948,7 +938,6 @@
 
     function updateTopbar(){
       $("#tbStudent").textContent = state.student || "—";
-      $("#tbClass").textContent = state.classCard || "—";
       $("#tbProgress").textContent = `${state.answered} / ${TOTAL_QUESTIONS}`;
       const acc = state.answered ? Math.round((state.correct / state.answered) * 100) : 100;
       $("#tbAccuracy").textContent = `${acc}%`;
@@ -996,23 +985,72 @@
       });
 
       state.answeredCurrent = false;
+      state.attemptsOnCurrent = 0;
+
       const fb = $("#feedback");
       fb.className = "feedback";
       fb.innerHTML = `<div class="lead" id="fbLead"></div><div id="fbExplain"></div><div class="hint" id="fbHint" style="margin-top:8px"></div>`;
-      $("#nextBtn").disabled = true;
 
       saveState();
     }
 
+    function showFeedback(type, lead, explain, hint){
+      const fb = $("#feedback");
+      fb.className = `feedback show ${type}`;
+      $("#fbLead").textContent = lead;
+      $("#fbExplain").innerHTML = explain || "";
+      $("#fbHint").innerHTML = hint ? `<strong>Hint:</strong> ${escapeHtml(hint)}` : "";
+    }
+
+    function disableAllChoices(){
+      [...document.querySelectorAll(".choice")].forEach(btn => btn.disabled = true);
+    }
+
+    function scheduleAutoAdvance(){
+      if(state.autoAdvanceId) clearTimeout(state.autoAdvanceId);
+      state.autoAdvanceId = setTimeout(() => {
+        nextQuestion();
+      }, AUTO_ADVANCE_DELAY);
+    }
+
     function handleAnswer(selected, btnEl){
       if(state.answeredCurrent) return;
-      state.answeredCurrent = true;
 
       const q = state.questionSet[state.index];
-      const correct = selected === q.answer;
-      state.answered++;
-      if(correct) state.correct++;
-      else {
+      const isCorrect = selected === q.answer;
+      state.attemptsOnCurrent++;
+
+      if(isCorrect){
+        state.answeredCurrent = true;
+        state.answered++;
+        state.correct++;
+
+        disableAllChoices();
+
+        [...document.querySelectorAll(".choice")].forEach(btn => {
+          const txt = btn.textContent;
+          if(txt === q.answer) btn.classList.add("correct");
+          else btn.classList.add("dimmed");
+        });
+
+        showFeedback(
+          "good",
+          "Correct",
+          `<div>${escapeHtml(q.explanation)}</div><div style="margin-top:8px"><em>Advancing...</em></div>`,
+          ""
+        );
+
+        updateTopbar();
+        saveState();
+        scheduleAutoAdvance();
+        return;
+      }
+
+      btnEl.classList.add("incorrect");
+      btnEl.disabled = true;
+
+      if(state.attemptsOnCurrent === 1){
+        state.answered++;
         state.misses.push({
           standard:q.standard,
           question:q.question,
@@ -1022,29 +1060,18 @@
         });
       }
 
-      [...document.querySelectorAll(".choice")].forEach(btn => {
-        btn.disabled = true;
-        const txt = btn.textContent;
-        if(txt === q.answer) btn.classList.add("correct");
-        if(txt === selected && !correct) btn.classList.add("incorrect");
-      });
+      showFeedback(
+        "bad",
+        "Try again",
+        `<div>${escapeHtml(q.explanation)}</div><div style="margin-top:8px">Use the hint, then choose again.</div>`,
+        q.hint
+      );
 
-      const fb = $("#feedback");
-      fb.classList.add("show", correct ? "good" : "bad");
-      $("#fbLead").textContent = correct ? "Correct" : "Not this time";
-      $("#fbExplain").innerHTML = `
-        <div>${escapeHtml(q.explanation)}</div>
-        ${!correct ? `<div style="margin-top:8px"><strong>Correct answer:</strong> ${escapeHtml(q.answer)}</div>` : ""}
-      `;
-      $("#fbHint").innerHTML = `<strong>Hint:</strong> ${escapeHtml(q.hint)}`;
-
-      $("#nextBtn").disabled = false;
       updateTopbar();
       saveState();
     }
 
     function nextQuestion(){
-      if(!state.answeredCurrent) return;
       state.index++;
       if(state.index >= TOTAL_QUESTIONS){
         finishGame();
@@ -1067,7 +1094,6 @@
             : `<span class="badText">Good start.</span> Review the concepts and restart for a stronger score.`;
 
       $("#resStudent").textContent = state.student || "—";
-      $("#resClass").textContent = state.classCard || "—";
       $("#resAccuracy").textContent = `${acc}%`;
       $("#resTime").textContent = formatTime(state.timerSec);
 
@@ -1079,8 +1105,8 @@
           <div class="missedItem">
             <div class="badge">${escapeHtml(m.standard)}</div>
             <div style="margin-top:8px;font-weight:800">${i+1}. ${escapeHtml(m.question)}</div>
-            <div class="mini muted" style="margin-top:6px"><strong>Your answer:</strong> ${escapeHtml(m.selected)}</div>
-            <div class="mini" style="margin-top:4px"><strong>Correct:</strong> ${escapeHtml(m.answer)}</div>
+            <div class="mini muted" style="margin-top:6px"><strong>First miss:</strong> ${escapeHtml(m.selected)}</div>
+            <div class="mini" style="margin-top:4px"><strong>Correct answer:</strong> ${escapeHtml(m.answer)}</div>
             <div class="mini muted" style="margin-top:6px">${escapeHtml(m.explanation)}</div>
           </div>
         `).join("");
@@ -1091,16 +1117,14 @@
 
     function startFreshGame(){
       const student = $("#studentName").value.trim();
-      const classCard = $("#classCard").value.trim();
 
-      if(!student || !classCard){
-        alert("Please enter both Student name and Class card before starting.");
+      if(!student){
+        alert("Please enter the student name before starting.");
         return;
       }
 
       state = {
         student,
-        classCard,
         startedAt: nowStamp(),
         questionSet: buildQuestionSet(),
         index:0,
@@ -1108,8 +1132,10 @@
         answered:0,
         misses:[],
         answeredCurrent:false,
+        attemptsOnCurrent:0,
         timerSec:0,
-        timerId:null
+        timerId:null,
+        autoAdvanceId:null
       };
 
       $("#tbStarted").textContent = state.startedAt;
@@ -1122,22 +1148,20 @@
     function restoreSavedGame(saved){
       state = {
         ...saved,
-        timerId:null
+        timerId:null,
+        autoAdvanceId:null
       };
       $("#studentName").value = state.student || "";
-      $("#classCard").value = state.classCard || "";
       showScreen("gameScreen");
       renderQuestion();
       startTimer();
     }
 
-    // ---------- events ----------
     $("#startBtn").addEventListener("click", startFreshGame);
     $("#resetSavedBtn").addEventListener("click", () => {
       clearState();
       alert("Saved attempt cleared.");
     });
-    $("#nextBtn").addEventListener("click", nextQuestion);
     $("#restartBtn").addEventListener("click", () => {
       if(confirm("Restart this game with a fresh shuffled run?")){
         stopTimer();
@@ -1152,7 +1176,6 @@
       showScreen("startScreen");
     });
 
-    // ---------- init ----------
     (() => {
       const saved = loadState();
       if(saved && saved.questionSet && Array.isArray(saved.questionSet) && saved.questionSet.length){
