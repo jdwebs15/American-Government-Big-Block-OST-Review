@@ -1,0 +1,1169 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Civic Engagement Arena — American Government OST Review</title>
+  <link rel="stylesheet" href="../styles.css" />
+  <style>
+    :root{
+      --bg:#0b1220;
+      --panel:#111a2f;
+      --panel2:#0f1730;
+      --text:#e7eefc;
+      --muted:#a8b4cf;
+      --line:rgba(255,255,255,.12);
+      --good:#2bd576;
+      --bad:#ff5c7a;
+      --warn:#ffd166;
+      --accent:#7aa2ff;
+      --shadow:0 18px 55px rgba(0,0,0,.40);
+      --radius:18px;
+      --mono:ui-monospace,SFMono-Regular,Menlo,Monaco,Consolas,"Liberation Mono","Courier New",monospace;
+    }
+    *{box-sizing:border-box}
+    html,body{margin:0;padding:0;background:linear-gradient(180deg,var(--bg),#070b14);color:var(--text);font-family:system-ui,-apple-system,Segoe UI,Roboto,Arial,sans-serif}
+    .wrap{width:min(1180px,94vw);margin:24px auto}
+    .panel{
+      background:linear-gradient(180deg,var(--panel),var(--panel2));
+      border:1px solid var(--line);
+      border-radius:var(--radius);
+      box-shadow:var(--shadow);
+    }
+    .screen{display:none}
+    .screen.active{display:block}
+    .hero{padding:24px}
+    .title{font-size:clamp(1.5rem,2.6vw,2.35rem);font-weight:900;letter-spacing:.2px;margin:0 0 8px}
+    .subtitle{color:var(--muted);line-height:1.45;margin:0}
+    .topbar{
+      display:grid;
+      grid-template-columns:1.35fr repeat(5, minmax(110px,1fr));
+      gap:10px;
+      padding:14px;
+      margin-bottom:16px;
+      align-items:stretch;
+    }
+    .stat{
+      border:1px solid var(--line);
+      border-radius:14px;
+      background:rgba(255,255,255,.04);
+      padding:10px 12px;
+      min-height:68px;
+      display:flex;
+      flex-direction:column;
+      justify-content:center;
+    }
+    .stat .k{font-size:.78rem;color:var(--muted);margin-bottom:4px}
+    .stat .v{font-weight:800;font-size:1rem}
+    .studentCard .v{font-size:.98rem;line-height:1.2}
+    .grid{display:grid;grid-template-columns:320px 1fr;gap:16px}
+    .left,.right{padding:16px}
+    .small{font-size:.9rem;color:var(--muted)}
+    .btnrow{display:flex;gap:10px;flex-wrap:wrap}
+    button{
+      appearance:none;border:0;cursor:pointer;
+      color:#08111f;font-weight:900;border-radius:12px;padding:12px 16px;
+      background:linear-gradient(180deg,#dfe8ff,#b8ccff);
+      box-shadow:0 10px 25px rgba(0,0,0,.25);
+    }
+    button.secondary{
+      color:var(--text);
+      background:linear-gradient(180deg,#1a2747,#13203c);
+      border:1px solid var(--line);
+      box-shadow:none;
+    }
+    button.good{background:linear-gradient(180deg,#cbffe0,#8df0b6)}
+    button.warn{background:linear-gradient(180deg,#fff2bf,#ffd166)}
+    button.bad{background:linear-gradient(180deg,#ffd5de,#ff9ab1)}
+    button:disabled{opacity:.6;cursor:not-allowed}
+    .card{
+      background:rgba(255,255,255,.035);
+      border:1px solid var(--line);
+      border-radius:16px;
+      padding:14px;
+    }
+    .label{font-size:.78rem;color:var(--muted);text-transform:uppercase;letter-spacing:.08em}
+    .gameName{
+      font-size:1.2rem;font-weight:900;margin:4px 0 10px;
+    }
+    .input, select{
+      width:100%;margin-top:6px;
+      background:#0d162a;color:var(--text);border:1px solid var(--line);
+      border-radius:12px;padding:12px 14px;font:inherit;
+    }
+    .chips{display:flex;flex-wrap:wrap;gap:8px;margin-top:8px}
+    .chip{
+      font-size:.8rem;padding:7px 10px;border-radius:999px;
+      background:rgba(122,162,255,.12);border:1px solid rgba(122,162,255,.28);color:#dfe8ff;
+    }
+    .qwrap{padding:18px}
+    .qhead{display:flex;justify-content:space-between;gap:12px;align-items:flex-start;margin-bottom:10px}
+    .qnum{font-size:.85rem;color:var(--muted);font-weight:800;letter-spacing:.06em;text-transform:uppercase}
+    .qstd{font-size:.8rem;color:#cfe0ff;background:rgba(122,162,255,.13);border:1px solid rgba(122,162,255,.25);padding:6px 10px;border-radius:999px;white-space:nowrap}
+    .passage{
+      margin:10px 0 14px;
+      background:rgba(255,255,255,.03);
+      border-left:4px solid rgba(122,162,255,.7);
+      border-radius:12px;
+      padding:14px 14px 14px 16px;
+      line-height:1.55;
+      color:#deebff;
+    }
+    .question{font-size:1.08rem;line-height:1.45;font-weight:750;margin:0 0 14px}
+    .choices{display:grid;gap:10px}
+    .choice{
+      width:100%;text-align:left;border:1px solid var(--line);
+      background:rgba(255,255,255,.04);color:var(--text);border-radius:14px;
+      padding:14px 14px 14px 48px;position:relative;font-weight:700;
+      box-shadow:none;
+    }
+    .choice::before{
+      content:attr(data-letter);
+      position:absolute;left:14px;top:50%;transform:translateY(-50%);
+      width:22px;height:22px;border-radius:50%;
+      background:rgba(255,255,255,.08);border:1px solid var(--line);
+      display:grid;place-items:center;color:#dce7ff;font-size:.82rem;font-weight:900;
+    }
+    .choice:hover{background:rgba(255,255,255,.07)}
+    .choice.correct{border-color:rgba(43,213,118,.45);background:rgba(43,213,118,.12)}
+    .choice.incorrect{border-color:rgba(255,92,122,.45);background:rgba(255,92,122,.12)}
+    .feedback{
+      margin-top:14px;border-radius:14px;padding:14px;border:1px solid var(--line);
+      background:rgba(255,255,255,.04);display:none
+    }
+    .feedback.show{display:block}
+    .feedback.good{border-color:rgba(43,213,118,.35);background:rgba(43,213,118,.10)}
+    .feedback.bad{border-color:rgba(255,92,122,.35);background:rgba(255,92,122,.10)}
+    .feedback .lead{font-weight:900;margin-bottom:6px}
+    .feedback .hint{color:#fff3c7}
+    .sideTitle{font-size:1rem;font-weight:900;margin:0 0 8px}
+    .rules ul,.coverage ul{margin:8px 0 0 18px;padding:0}
+    .rules li,.coverage li{margin:6px 0;line-height:1.4}
+    .progressBar{
+      width:100%;height:12px;border-radius:999px;background:rgba(255,255,255,.07);
+      border:1px solid var(--line);overflow:hidden
+    }
+    .progressFill{
+      height:100%;width:0%;
+      background:linear-gradient(90deg,#79a6ff,#2bd576);
+      transition:width .25s ease;
+    }
+    .legend{
+      display:flex;justify-content:space-between;gap:12px;color:var(--muted);
+      font-size:.9rem;margin-top:8px
+    }
+    .footBtns{display:flex;gap:10px;flex-wrap:wrap;margin-top:14px}
+    .results{padding:24px}
+    .scoreBig{font-size:clamp(2rem,5vw,3rem);font-weight:1000;line-height:1;margin:4px 0 8px}
+    .resultGrid{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin-top:16px}
+    .resultBox{
+      border:1px solid var(--line);border-radius:16px;padding:14px;background:rgba(255,255,255,.04)
+    }
+    .missedList{display:grid;gap:10px;margin-top:16px}
+    .missedItem{
+      border:1px solid var(--line);border-radius:14px;padding:12px;background:rgba(255,255,255,.035)
+    }
+    .muted{color:var(--muted)}
+    .mini{font-size:.86rem}
+    .mono{font-family:var(--mono)}
+    .badge{
+      display:inline-block;padding:6px 10px;border-radius:999px;
+      border:1px solid var(--line);background:rgba(255,255,255,.05);font-size:.8rem;font-weight:800
+    }
+    .goodText{color:#93f0b7}
+    .warnText{color:#ffe28b}
+    .badText{color:#ffafc0}
+    @media (max-width: 980px){
+      .topbar{grid-template-columns:1fr 1fr}
+      .grid{grid-template-columns:1fr}
+      .resultGrid{grid-template-columns:1fr 1fr}
+    }
+    @media (max-width: 640px){
+      .wrap{width:min(96vw,96vw);margin:12px auto}
+      .topbar{grid-template-columns:1fr}
+      .resultGrid{grid-template-columns:1fr}
+      .qhead{flex-direction:column;align-items:flex-start}
+      .left,.right,.qwrap,.hero,.results{padding:14px}
+    }
+  </style>
+</head>
+<body>
+  <div class="wrap">
+
+    <!-- START SCREEN -->
+    <section id="startScreen" class="screen active panel">
+      <div class="hero">
+        <div class="label">American Government OST Review</div>
+        <h1 class="title">Civic Engagement Arena</h1>
+        <p class="subtitle">
+          Tuesday Big Block Review • Content Statements 1–4<br>
+          Civic engagement, parties and interest groups, source credibility, persuasion and compromise.
+        </p>
+      </div>
+
+      <div class="grid">
+        <div class="left">
+          <div class="card">
+            <div class="label">Game HTML Name</div>
+            <div class="gameName">civic-engagement-arena.html</div>
+            <div class="small">Drop this file into your Government hub games folder.</div>
+          </div>
+
+          <div class="card" style="margin-top:14px">
+            <div class="label">Class Card</div>
+            <input id="studentName" class="input" type="text" placeholder="Student name" maxlength="40" />
+            <input id="classCard" class="input" type="text" placeholder="Class card / period" maxlength="40" />
+            <div class="chips">
+              <span class="chip">30 questions</span>
+              <span class="chip">Shuffled order</span>
+              <span class="chip">Shuffled answers</span>
+              <span class="chip">Hints only</span>
+              <span class="chip">Mastery flow</span>
+            </div>
+            <div class="footBtns">
+              <button id="startBtn">Start Game</button>
+              <button id="resetSavedBtn" class="secondary">Reset Saved Attempt</button>
+            </div>
+          </div>
+        </div>
+
+        <div class="right">
+          <div class="card rules">
+            <h2 class="sideTitle">How it works</h2>
+            <ul>
+              <li>Read each scenario carefully.</li>
+              <li>Select the best answer.</li>
+              <li>If you miss one, you will get a <strong>hint</strong> and explanation.</li>
+              <li>The hint points you toward the concept, but does <strong>not</strong> hand you the answer.</li>
+              <li>Your progress, accuracy, timer, and class card stay visible during the game.</li>
+            </ul>
+          </div>
+
+          <div class="card coverage" style="margin-top:14px">
+            <h2 class="sideTitle">Content coverage</h2>
+            <ul>
+              <li><strong>CS 1:</strong> Civic engagement process, action plans, consequences, costs and benefits</li>
+              <li><strong>CS 2:</strong> Political parties, interest groups, media</li>
+              <li><strong>CS 3:</strong> Credible sources, evidence, bias, reliability</li>
+              <li><strong>CS 4:</strong> Persuasion, compromise, consensus building, negotiation</li>
+            </ul>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- GAME SCREEN -->
+    <section id="gameScreen" class="screen">
+      <div class="panel topbar">
+        <div class="stat studentCard">
+          <div class="k">Student</div>
+          <div class="v" id="tbStudent">—</div>
+        </div>
+        <div class="stat">
+          <div class="k">Class Card</div>
+          <div class="v" id="tbClass">—</div>
+        </div>
+        <div class="stat">
+          <div class="k">Progress</div>
+          <div class="v" id="tbProgress">0 / 30</div>
+        </div>
+        <div class="stat">
+          <div class="k">Accuracy</div>
+          <div class="v" id="tbAccuracy">100%</div>
+        </div>
+        <div class="stat">
+          <div class="k">Timer</div>
+          <div class="v mono" id="tbTimer">00:00</div>
+        </div>
+        <div class="stat">
+          <div class="k">Started</div>
+          <div class="v mono mini" id="tbStarted">—</div>
+        </div>
+      </div>
+
+      <div class="grid">
+        <aside class="left panel">
+          <div class="card">
+            <div class="label">Game</div>
+            <div class="gameName">Civic Engagement Arena</div>
+            <div class="small">Big Block Tuesday review for CS 1–4.</div>
+          </div>
+
+          <div class="card" style="margin-top:14px">
+            <div class="label">Progress Bar</div>
+            <div class="progressBar" aria-label="progress">
+              <div class="progressFill" id="progressFill"></div>
+            </div>
+            <div class="legend">
+              <span id="legendLeft">Question 1 of 30</span>
+              <span id="legendRight">Mastery Run</span>
+            </div>
+          </div>
+
+          <div class="card" style="margin-top:14px">
+            <div class="label">Rules</div>
+            <ul class="mini" style="margin:8px 0 0 18px;padding:0">
+              <li>One best answer per question.</li>
+              <li>Use the hint only after you have committed to a choice.</li>
+              <li>Questions and answer choices are shuffled each new run.</li>
+              <li>Restart is available if you want a fresh mastery attempt.</li>
+            </ul>
+          </div>
+
+          <div class="footBtns" style="margin-top:14px">
+            <button id="restartBtn" class="warn">Restart</button>
+            <button id="backBtn" class="secondary">Back to Hub</button>
+          </div>
+        </aside>
+
+        <main class="right panel">
+          <div class="qwrap">
+            <div class="qhead">
+              <div>
+                <div class="qnum" id="qNum">Question 1</div>
+                <h2 class="question" id="qText">Loading...</h2>
+              </div>
+              <div class="qstd" id="qStandard">CS 1</div>
+            </div>
+
+            <div id="qPassage" class="passage" style="display:none"></div>
+
+            <div id="choices" class="choices"></div>
+
+            <div id="feedback" class="feedback">
+              <div class="lead" id="fbLead"></div>
+              <div id="fbExplain"></div>
+              <div class="hint" id="fbHint" style="margin-top:8px"></div>
+            </div>
+
+            <div class="footBtns">
+              <button id="nextBtn" class="good" disabled>Next Question</button>
+            </div>
+          </div>
+        </main>
+      </div>
+    </section>
+
+    <!-- RESULTS SCREEN -->
+    <section id="resultsScreen" class="screen panel">
+      <div class="results">
+        <div class="label">Results</div>
+        <div class="scoreBig" id="finalScore">0 / 30</div>
+        <div class="muted" id="finalMessage">Nice work.</div>
+
+        <div class="resultGrid">
+          <div class="resultBox">
+            <div class="label">Student</div>
+            <div class="gameName" id="resStudent">—</div>
+          </div>
+          <div class="resultBox">
+            <div class="label">Class Card</div>
+            <div class="gameName" id="resClass">—</div>
+          </div>
+          <div class="resultBox">
+            <div class="label">Accuracy</div>
+            <div class="gameName" id="resAccuracy">0%</div>
+          </div>
+          <div class="resultBox">
+            <div class="label">Time</div>
+            <div class="gameName mono" id="resTime">00:00</div>
+          </div>
+        </div>
+
+        <div class="card" style="margin-top:16px">
+          <div class="label">Standards hit</div>
+          <div class="chips" style="margin-top:10px">
+            <span class="chip">CS 1 Civic Engagement</span>
+            <span class="chip">CS 2 Parties / Interest Groups / Media</span>
+            <span class="chip">CS 3 Credible Sources</span>
+            <span class="chip">CS 4 Democratic Process Skills</span>
+          </div>
+        </div>
+
+        <div class="card" style="margin-top:16px">
+          <div class="label">Missed Questions Review</div>
+          <div id="missedList" class="missedList">
+            <div class="muted">Perfect run — no misses to review.</div>
+          </div>
+        </div>
+
+        <div class="footBtns">
+          <button id="playAgainBtn">Play Again</button>
+          <button id="resultsBackBtn" class="secondary">Back to Hub</button>
+        </div>
+      </div>
+    </section>
+
+  </div>
+
+  <script>
+    const GAME_TITLE = "Civic Engagement Arena";
+    const GAME_FILE_NAME = "civic-engagement-arena.html";
+    const TOTAL_QUESTIONS = 30;
+    const STORAGE_KEY = "gov_ost_civic_engagement_arena_v1";
+
+    const QUESTION_BANK = [
+      {
+        standard:"CS 1",
+        passage:"A group of students notices that the crosswalk near school has faded paint and drivers often ignore it during dismissal.",
+        question:"What should the students do first if they want to follow the civic engagement process correctly?",
+        choices:[
+          "Identify the safety issue and collect information about the problem",
+          "Demand that the mayor replace the police chief immediately",
+          "Refuse to discuss any solutions until the city acts",
+          "Celebrate the future improvement before presenting evidence"
+        ],
+        answer:"Identify the safety issue and collect information about the problem",
+        explanation:"The civic engagement process begins by identifying the issue and researching it before proposing solutions.",
+        hint:"Start with the problem itself before jumping to action. Good civic work begins with identifying and researching."
+      },
+      {
+        standard:"CS 1",
+        passage:"Residents want a vacant lot turned into a neighborhood playground, but different ideas have been suggested for how to use the space.",
+        question:"Which action best shows the group is weighing costs and benefits before making a recommendation?",
+        choices:[
+          "Choosing the loudest proposal immediately",
+          "Comparing playground costs, parking needs, safety concerns, and community use",
+          "Ignoring all drawbacks because the idea sounds positive",
+          "Waiting for government officials to decide without offering input"
+        ],
+        answer:"Comparing playground costs, parking needs, safety concerns, and community use",
+        explanation:"The standards emphasize examining consequences and weighing costs and benefits before proposing a solution.",
+        hint:"Look for the answer that compares options instead of rushing to one idea."
+      },
+      {
+        standard:"CS 1",
+        passage:"A city youth council wants the town to install more lighting in a public park after dark.",
+        question:"Which step best reflects the expectation for learning in CS 1?",
+        choices:[
+          "Posting angry comments online without contacting officials",
+          "Researching incidents, proposing a plan, and presenting it through the proper government process",
+          "Skipping research because the issue seems obvious",
+          "Demanding a policy change without considering consequences"
+        ],
+        answer:"Researching incidents, proposing a plan, and presenting it through the proper government process",
+        explanation:"CS 1 focuses on devising and implementing a plan through political or public policy processes.",
+        hint:"The best answer includes research, a plan, and action through government structures."
+      },
+      {
+        standard:"CS 1",
+        passage:"Students are concerned that cafeteria lines are too long and reduce time to eat lunch.",
+        question:"Which proposal best shows an action plan rather than only a complaint?",
+        choices:[
+          "Telling everyone the cafeteria is unfair",
+          "Creating a plan with data, options, likely outcomes, and a recommendation for administrators",
+          "Refusing to listen to staff concerns about scheduling",
+          "Posting a poll online and assuming that solves the issue"
+        ],
+        answer:"Creating a plan with data, options, likely outcomes, and a recommendation for administrators",
+        explanation:"An action plan includes evidence, options, and implementation steps—not just criticism.",
+        hint:"An action plan has structure: data, options, recommendation, and next steps."
+      },
+      {
+        standard:"CS 1",
+        passage:"A neighborhood group wants speed reduced on a residential street.",
+        question:"Which option best reflects using the public policy process rather than the political process?",
+        choices:[
+          "Campaigning for a candidate who promises to support traffic reforms",
+          "Asking a city agency to study traffic patterns and install calming measures",
+          "Creating a new political party for one election",
+          "Running television ads to influence voters"
+        ],
+        answer:"Asking a city agency to study traffic patterns and install calming measures",
+        explanation:"The public policy process involves government institutions carrying out functions and implementing solutions.",
+        hint:"Think government action and implementation, not election activity."
+      },
+      {
+        standard:"CS 1",
+        passage:"A student group wants to improve recycling at school.",
+        question:"Which approach best follows the full civic engagement sequence?",
+        choices:[
+          "Identify the issue, research current waste patterns, debate options, propose a solution, and examine consequences",
+          "Choose the easiest idea first and defend it no matter what",
+          "Wait for the principal to raise the issue without student involvement",
+          "Focus only on what sounds popular, not what is workable"
+        ],
+        answer:"Identify the issue, research current waste patterns, debate options, propose a solution, and examine consequences",
+        explanation:"That sequence directly reflects the civic engagement steps in CS 1.",
+        hint:"Look for the answer that includes the whole process from issue identification through consequences."
+      },
+      {
+        standard:"CS 1",
+        passage:"A local teen advisory board wants to reduce distracted driving near school.",
+        question:"Which action best shows they are examining possible consequences of a proposed solution?",
+        choices:[
+          "Studying whether extra signs, police presence, or parent pickup changes might affect traffic flow differently",
+          "Assuming any change is automatically successful",
+          "Refusing to ask drivers or police for input",
+          "Ignoring cost because safety is the only concern"
+        ],
+        answer:"Studying whether extra signs, police presence, or parent pickup changes might affect traffic flow differently",
+        explanation:"Examining consequences means considering what different solutions might produce in practice.",
+        hint:"Find the choice that studies likely effects of multiple possible solutions."
+      },
+      {
+        standard:"CS 1",
+        passage:"Community members are trying to get a dangerous abandoned building addressed.",
+        question:"Which response is the strongest example of civic engagement?",
+        choices:[
+          "Document the problem, contact local officials, propose possible remedies, and follow up through city channels",
+          "Spread rumors about who is responsible",
+          "Demand action without evidence",
+          "Avoid public meetings because they take too much time"
+        ],
+        answer:"Document the problem, contact local officials, propose possible remedies, and follow up through city channels",
+        explanation:"Strong civic engagement includes evidence, communication with the correct officials, and solution-oriented follow-up.",
+        hint:"The best answer is organized, evidence-based, and works through the correct government route."
+      },
+      {
+        standard:"CS 2",
+        passage:"A national organization endorses candidates, organizes voter turnout, and tries to win control of elected offices.",
+        question:"This organization is acting most like",
+        choices:[
+          "a political party",
+          "a jury",
+          "a court of appeals",
+          "a regulatory agency"
+        ],
+        answer:"a political party",
+        explanation:"Political parties seek to influence public policy primarily by winning elections and holding office.",
+        hint:"Ask yourself which group's main goal is winning elections."
+      },
+      {
+        standard:"CS 2",
+        passage:"A teachers’ association buys advertisements and lobbies lawmakers about education funding.",
+        question:"This is the best example of",
+        choices:[
+          "an interest group using media and lobbying to influence public policy",
+          "the judicial branch enforcing a law",
+          "a political party appointing judges",
+          "a media outlet running for office"
+        ],
+        answer:"an interest group using media and lobbying to influence public policy",
+        explanation:"Interest groups try to influence public policy without mainly trying to elect their own members to office.",
+        hint:"This group is not trying to win office itself; it is trying to shape policy."
+      },
+      {
+        standard:"CS 2",
+        passage:"A group of environmental advocates launches a social media campaign to build support for stricter pollution limits.",
+        question:"Why are they using media in this situation?",
+        choices:[
+          "To influence public opinion and the public-policy process",
+          "To replace the need for all government action",
+          "To automatically make a law take effect",
+          "To appoint members of Congress"
+        ],
+        answer:"To influence public opinion and the public-policy process",
+        explanation:"The media provides a means of communication through which parties and interest groups can influence policy processes.",
+        hint:"Media is primarily about communication and influence here."
+      },
+      {
+        standard:"CS 2",
+        passage:"A local political party recruits volunteers, raises campaign money, and helps candidates get elected.",
+        question:"What is the party trying to do most directly?",
+        choices:[
+          "Shape public policy by winning elections",
+          "Interpret laws through the courts",
+          "Conduct criminal investigations",
+          "Administer local zoning rules"
+        ],
+        answer:"Shape public policy by winning elections",
+        explanation:"Political parties seek to determine public policy by helping their members win office.",
+        hint:"Political parties work through elections first."
+      },
+      {
+        standard:"CS 2",
+        passage:"A business association testifies before a legislative committee about a proposed regulation.",
+        question:"Which statement best explains the role of this association?",
+        choices:[
+          "It is acting as an interest group seeking to influence policy decisions",
+          "It is serving as a media outlet reporting neutral facts",
+          "It is acting as the executive branch by enforcing regulations",
+          "It is functioning as a court reviewing constitutionality"
+        ],
+        answer:"It is acting as an interest group seeking to influence policy decisions",
+        explanation:"Interest groups influence lawmaking and policy execution through lobbying, testimony, and advocacy.",
+        hint:"Testifying to influence lawmakers is classic interest-group behavior."
+      },
+      {
+        standard:"CS 2",
+        passage:"Two organizations both care deeply about public issues. One focuses on electing candidates. The other focuses on pressuring officeholders after elections.",
+        question:"How are these groups different?",
+        choices:[
+          "One behaves as a political party, while the other behaves as an interest group",
+          "One is judicial, while the other is executive",
+          "One is state government, while the other is federal government",
+          "One is the media, while the other is a legislature"
+        ],
+        answer:"One behaves as a political party, while the other behaves as an interest group",
+        explanation:"Political parties emphasize elections and office-holding, while interest groups emphasize influencing policy outcomes.",
+        hint:"Focus on the main method: winning office versus influencing officials."
+      },
+      {
+        standard:"CS 2",
+        passage:"An advocacy group makes a podcast series explaining why city council should update housing rules.",
+        question:"Which concept is most clearly shown?",
+        choices:[
+          "An interest group using media to influence public policy",
+          "A court issuing an appellate decision",
+          "A political party certifying election results",
+          "An executive agency enforcing criminal law"
+        ],
+        answer:"An interest group using media to influence public policy",
+        explanation:"The group is using a media tool to communicate its position and influence the policy process.",
+        hint:"Podcast + advocacy + policy pressure points to a particular kind of organization."
+      },
+      {
+        standard:"CS 2",
+        passage:"A voter asks how political parties and interest groups are similar.",
+        question:"Which answer is best?",
+        choices:[
+          "Both consist of people with similar views on public issues",
+          "Both are branches of government",
+          "Both mainly decide court cases",
+          "Both automatically make laws without elections"
+        ],
+        answer:"Both consist of people with similar views on public issues",
+        explanation:"Both parties and interest groups are organized around shared views, though they pursue influence differently.",
+        hint:"Think shared views first; methods differ later."
+      },
+      {
+        standard:"CS 3",
+        passage:"A student is researching whether the city should raise parking fees downtown.",
+        question:"Which source is likely the most credible?",
+        choices:[
+          "A nonpartisan report with named authors, data tables, and cited evidence",
+          "An anonymous post claiming insider knowledge",
+          "A meme with no source listed",
+          "A rant that gives no supporting facts"
+        ],
+        answer:"A nonpartisan report with named authors, data tables, and cited evidence",
+        explanation:"Credibility increases when authorship, evidence, logical conclusions, and verifiable support are present.",
+        hint:"The strongest source has named authors and evidence you can check."
+      },
+      {
+        standard:"CS 3",
+        passage:"Two articles disagree about a proposed school levy. One includes official budget data and quotes several named experts. The other uses emotional language and no sources.",
+        question:"Which article is more credible?",
+        choices:[
+          "The one using official data and named experts",
+          "The emotional one because it sounds passionate",
+          "Neither article can be evaluated",
+          "The shortest article because it is easier to read"
+        ],
+        answer:"The one using official data and named experts",
+        explanation:"Credible sources support claims with evidence and reliable attribution.",
+        hint:"Good sourcing and evidence matter more than tone."
+      },
+      {
+        standard:"CS 3",
+        passage:"A speaker says a website is trustworthy because “it agrees with what most people already think.”",
+        question:"What is the best evaluation of that statement?",
+        choices:[
+          "It is weak because agreement alone does not prove credibility",
+          "It is strong because popularity proves truth",
+          "It is correct if the website is short and easy to read",
+          "It is correct because bias never matters online"
+        ],
+        answer:"It is weak because agreement alone does not prove credibility",
+        explanation:"Credibility depends on evidence, reliability, authorship, logic, and bias—not simply agreement or popularity.",
+        hint:"Matching opinions is not the same as proving reliability."
+      },
+      {
+        standard:"CS 3",
+        passage:"A student compares several articles about a public issue.",
+        question:"Which factor should the student consider when evaluating source credibility?",
+        choices:[
+          "Whether the author is qualified and uses supporting evidence",
+          "Whether the article uses the largest font",
+          "Whether the article avoids all disagreement",
+          "Whether the article matches the student's personal opinion"
+        ],
+        answer:"Whether the author is qualified and uses supporting evidence",
+        explanation:"CS 3 focuses on qualifications, evidence, logic, consistency, and possible bias.",
+        hint:"Look for expertise plus evidence."
+      },
+      {
+        standard:"CS 3",
+        passage:"A blog post makes bold claims but includes no author name, no citations, and no supporting data.",
+        question:"Which conclusion is most justified?",
+        choices:[
+          "The source is less credible because important reliability factors are missing",
+          "The source is credible because strong claims show confidence",
+          "The source is credible if it is widely shared",
+          "The source should automatically be treated as expert analysis"
+        ],
+        answer:"The source is less credible because important reliability factors are missing",
+        explanation:"Anonymous authorship and lack of evidence are major warnings when evaluating credibility.",
+        hint:"Missing author and missing proof are both red flags."
+      },
+      {
+        standard:"CS 3",
+        passage:"An article's conclusion closely follows the evidence it presents and is consistent with other trustworthy reports.",
+        question:"What does this most strongly suggest?",
+        choices:[
+          "The source is more credible",
+          "The source is biased simply because it has a conclusion",
+          "The source should be ignored because other sources agree",
+          "The source is unreliable because it uses evidence"
+        ],
+        answer:"The source is more credible",
+        explanation:"Agreement with other credible sources and logical conclusions strengthen credibility.",
+        hint:"Consistency plus evidence is a strong sign of reliability."
+      },
+      {
+        standard:"CS 3",
+        passage:"A student sees two videos about the same issue. One clearly separates opinion from fact and lists where its numbers came from.",
+        question:"Why is that important?",
+        choices:[
+          "Because verifiable evidence and transparency improve credibility",
+          "Because presentation style matters more than content",
+          "Because all videos are equally reliable",
+          "Because numbers automatically eliminate bias"
+        ],
+        answer:"Because verifiable evidence and transparency improve credibility",
+        explanation:"Clear sourcing and evidence allow viewers to judge whether claims are trustworthy.",
+        hint:"Transparency helps the audience check the claims."
+      },
+      {
+        standard:"CS 3",
+        passage:"A social media post says, “Trust me—I know people involved,” but provides no details.",
+        question:"What is the strongest criticism of this source?",
+        choices:[
+          "It lacks verifiable supporting evidence",
+          "It is too short to read",
+          "It uses technology",
+          "It mentions people"
+        ],
+        answer:"It lacks verifiable supporting evidence",
+        explanation:"Without evidence that can be checked, the source is weak for civic research.",
+        hint:"Good civic research needs proof you can verify."
+      },
+      {
+        standard:"CS 4",
+        passage:"A city council is split on whether to fund a new bike path. After debate, both sides revise their positions and support a smaller project everyone can live with.",
+        question:"This outcome is the best example of",
+        choices:[
+          "compromise",
+          "judicial review",
+          "federalism",
+          "impeachment"
+        ],
+        answer:"compromise",
+        explanation:"Compromise means each side gives up part of what it wants in order to reach agreement.",
+        hint:"No side gets everything here."
+      },
+      {
+        standard:"CS 4",
+        passage:"A committee holds several meetings and eventually reaches a plan that most members can support, even if it is not each member’s first choice.",
+        question:"This most clearly illustrates",
+        choices:[
+          "consensus building",
+          "executive privilege",
+          "nullification",
+          "judicial activism"
+        ],
+        answer:"consensus building",
+        explanation:"Consensus building is the process of developing broad support for a shared decision.",
+        hint:"The key idea is broad support, not total victory by one side."
+      },
+      {
+        standard:"CS 4",
+        passage:"During a school board discussion, one member uses evidence and reasoning to change another member’s position on an issue.",
+        question:"Which democratic skill is shown most clearly?",
+        choices:[
+          "persuasion",
+          "incorporation",
+          "veto",
+          "federal supremacy"
+        ],
+        answer:"persuasion",
+        explanation:"Persuasion involves using arguments and evidence to influence others' views.",
+        hint:"Think convincing, not forcing."
+      },
+      {
+        standard:"CS 4",
+        passage:"Representatives from two community groups meet to settle a disagreement over event scheduling and work through several possible arrangements.",
+        question:"Which term best describes this process?",
+        choices:[
+          "negotiation",
+          "judicial review",
+          "ratification",
+          "separation of powers"
+        ],
+        answer:"negotiation",
+        explanation:"Negotiation involves discussion and back-and-forth efforts to settle differences.",
+        hint:"They are actively working through options together."
+      },
+      {
+        standard:"CS 4",
+        passage:"A legislature functions best when members can disagree strongly but still find a workable path forward.",
+        question:"Why are persuasion, compromise, consensus building, and negotiation important in a democracy?",
+        choices:[
+          "They help settle differences and make governing possible",
+          "They eliminate every disagreement permanently",
+          "They remove the need for laws and elections",
+          "They guarantee each person gets exactly what they want"
+        ],
+        answer:"They help settle differences and make governing possible",
+        explanation:"Democratic decision-making depends on these skills to resolve differences and move public business forward.",
+        hint:"The best answer focuses on making democratic decision-making work."
+      },
+      {
+        standard:"CS 4",
+        passage:"A student senate cannot agree on how to spend its budget. After discussion, members combine features from several proposals into one plan.",
+        question:"Which combination of democratic skills is most evident?",
+        choices:[
+          "Negotiation and compromise",
+          "Judicial review and federalism",
+          "Veto and impeachment",
+          "Due process and incorporation"
+        ],
+        answer:"Negotiation and compromise",
+        explanation:"Members discussed options and gave ground to reach a shared plan.",
+        hint:"They talked through differences and blended positions."
+      },
+      {
+        standard:"CS 4",
+        passage:"Several neighborhood groups disagree over where to place a new community garden. After listening sessions, they support a site that is not perfect for everyone but acceptable to most.",
+        question:"This is the strongest example of",
+        choices:[
+          "consensus building",
+          "strict scrutiny",
+          "executive enforcement",
+          "double jeopardy"
+        ],
+        answer:"consensus building",
+        explanation:"Consensus building emphasizes creating broad agreement across different viewpoints.",
+        hint:"The decision gains broad support even without total agreement."
+      }
+    ];
+
+    // ---------- utility ----------
+    const $ = sel => document.querySelector(sel);
+
+    function shuffleArray(arr){
+      const a = arr.slice();
+      for(let i=a.length-1;i>0;i--){
+        const j = Math.floor(Math.random()*(i+1));
+        [a[i],a[j]] = [a[j],a[i]];
+      }
+      return a;
+    }
+
+    function formatTime(sec){
+      const m = Math.floor(sec/60).toString().padStart(2,'0');
+      const s = Math.floor(sec%60).toString().padStart(2,'0');
+      return `${m}:${s}`;
+    }
+
+    function nowStamp(){
+      const d = new Date();
+      return d.toLocaleString([], {
+        year:'2-digit', month:'2-digit', day:'2-digit',
+        hour:'2-digit', minute:'2-digit'
+      });
+    }
+
+    function escapeHtml(str){
+      return String(str)
+        .replaceAll('&','&amp;')
+        .replaceAll('<','&lt;')
+        .replaceAll('>','&gt;')
+        .replaceAll('"','&quot;')
+        .replaceAll("'","&#39;");
+    }
+
+    function goHub(){
+      window.location.href = "../index.html";
+    }
+
+    // ---------- state ----------
+    let state = {
+      student:"",
+      classCard:"",
+      startedAt:"",
+      questionSet:[],
+      index:0,
+      correct:0,
+      answered:0,
+      misses:[],
+      answeredCurrent:false,
+      timerSec:0,
+      timerId:null
+    };
+
+    function buildQuestionSet(){
+      const picked = shuffleArray(QUESTION_BANK).slice(0, TOTAL_QUESTIONS).map(q => {
+        const shuffledChoices = shuffleArray(q.choices);
+        return {
+          ...q,
+          shuffledChoices
+        };
+      });
+      return picked;
+    }
+
+    function saveState(){
+      const safe = {
+        ...state,
+        timerId:null
+      };
+      localStorage.setItem(STORAGE_KEY, JSON.stringify(safe));
+    }
+
+    function loadState(){
+      try{
+        const raw = localStorage.getItem(STORAGE_KEY);
+        if(!raw) return null;
+        return JSON.parse(raw);
+      }catch(e){
+        return null;
+      }
+    }
+
+    function clearState(){
+      localStorage.removeItem(STORAGE_KEY);
+    }
+
+    function startTimer(){
+      stopTimer();
+      state.timerId = setInterval(() => {
+        state.timerSec++;
+        $("#tbTimer").textContent = formatTime(state.timerSec);
+        saveState();
+      }, 1000);
+    }
+
+    function stopTimer(){
+      if(state.timerId) clearInterval(state.timerId);
+      state.timerId = null;
+    }
+
+    function showScreen(id){
+      ["startScreen","gameScreen","resultsScreen"].forEach(s => {
+        document.getElementById(s).classList.toggle("active", s===id);
+      });
+    }
+
+    function updateTopbar(){
+      $("#tbStudent").textContent = state.student || "—";
+      $("#tbClass").textContent = state.classCard || "—";
+      $("#tbProgress").textContent = `${state.answered} / ${TOTAL_QUESTIONS}`;
+      const acc = state.answered ? Math.round((state.correct / state.answered) * 100) : 100;
+      $("#tbAccuracy").textContent = `${acc}%`;
+      $("#tbTimer").textContent = formatTime(state.timerSec);
+      $("#tbStarted").textContent = state.startedAt || "—";
+      $("#progressFill").style.width = `${(state.answered / TOTAL_QUESTIONS) * 100}%`;
+      $("#legendLeft").textContent = `Question ${Math.min(state.index + 1, TOTAL_QUESTIONS)} of ${TOTAL_QUESTIONS}`;
+      $("#legendRight").textContent = acc === 100 ? "Mastery Run" : "Keep Grinding";
+    }
+
+    function renderQuestion(){
+      updateTopbar();
+
+      const q = state.questionSet[state.index];
+      if(!q){
+        finishGame();
+        return;
+      }
+
+      $("#qNum").textContent = `Question ${state.index + 1}`;
+      $("#qText").textContent = q.question;
+      $("#qStandard").textContent = q.standard;
+
+      const passageEl = $("#qPassage");
+      if(q.passage && q.passage.trim()){
+        passageEl.style.display = "block";
+        passageEl.innerHTML = escapeHtml(q.passage);
+      } else {
+        passageEl.style.display = "none";
+        passageEl.textContent = "";
+      }
+
+      const choicesEl = $("#choices");
+      choicesEl.innerHTML = "";
+      const letters = ["A","B","C","D"];
+
+      q.shuffledChoices.forEach((choice, i) => {
+        const btn = document.createElement("button");
+        btn.className = "choice";
+        btn.type = "button";
+        btn.dataset.letter = letters[i];
+        btn.innerHTML = escapeHtml(choice);
+        btn.addEventListener("click", () => handleAnswer(choice, btn));
+        choicesEl.appendChild(btn);
+      });
+
+      state.answeredCurrent = false;
+      const fb = $("#feedback");
+      fb.className = "feedback";
+      fb.innerHTML = `<div class="lead" id="fbLead"></div><div id="fbExplain"></div><div class="hint" id="fbHint" style="margin-top:8px"></div>`;
+      $("#nextBtn").disabled = true;
+
+      saveState();
+    }
+
+    function handleAnswer(selected, btnEl){
+      if(state.answeredCurrent) return;
+      state.answeredCurrent = true;
+
+      const q = state.questionSet[state.index];
+      const correct = selected === q.answer;
+      state.answered++;
+      if(correct) state.correct++;
+      else {
+        state.misses.push({
+          standard:q.standard,
+          question:q.question,
+          selected,
+          answer:q.answer,
+          explanation:q.explanation
+        });
+      }
+
+      [...document.querySelectorAll(".choice")].forEach(btn => {
+        btn.disabled = true;
+        const txt = btn.textContent;
+        if(txt === q.answer) btn.classList.add("correct");
+        if(txt === selected && !correct) btn.classList.add("incorrect");
+      });
+
+      const fb = $("#feedback");
+      fb.classList.add("show", correct ? "good" : "bad");
+      $("#fbLead").textContent = correct ? "Correct" : "Not this time";
+      $("#fbExplain").innerHTML = `
+        <div>${escapeHtml(q.explanation)}</div>
+        ${!correct ? `<div style="margin-top:8px"><strong>Correct answer:</strong> ${escapeHtml(q.answer)}</div>` : ""}
+      `;
+      $("#fbHint").innerHTML = `<strong>Hint:</strong> ${escapeHtml(q.hint)}`;
+
+      $("#nextBtn").disabled = false;
+      updateTopbar();
+      saveState();
+    }
+
+    function nextQuestion(){
+      if(!state.answeredCurrent) return;
+      state.index++;
+      if(state.index >= TOTAL_QUESTIONS){
+        finishGame();
+      } else {
+        renderQuestion();
+      }
+    }
+
+    function finishGame(){
+      stopTimer();
+      clearState();
+
+      const acc = state.answered ? Math.round((state.correct / state.answered) * 100) : 0;
+      $("#finalScore").textContent = `${state.correct} / ${TOTAL_QUESTIONS}`;
+      $("#finalMessage").innerHTML =
+        acc === 100
+          ? `<span class="goodText">Perfect mastery run.</span> Outstanding work.`
+          : acc >= 85
+            ? `<span class="warnText">Strong run.</span> Review the misses and go again for mastery.`
+            : `<span class="badText">Good start.</span> Review the concepts and restart for a stronger score.`;
+
+      $("#resStudent").textContent = state.student || "—";
+      $("#resClass").textContent = state.classCard || "—";
+      $("#resAccuracy").textContent = `${acc}%`;
+      $("#resTime").textContent = formatTime(state.timerSec);
+
+      const list = $("#missedList");
+      if(!state.misses.length){
+        list.innerHTML = `<div class="muted">Perfect run — no misses to review.</div>`;
+      } else {
+        list.innerHTML = state.misses.map((m, i) => `
+          <div class="missedItem">
+            <div class="badge">${escapeHtml(m.standard)}</div>
+            <div style="margin-top:8px;font-weight:800">${i+1}. ${escapeHtml(m.question)}</div>
+            <div class="mini muted" style="margin-top:6px"><strong>Your answer:</strong> ${escapeHtml(m.selected)}</div>
+            <div class="mini" style="margin-top:4px"><strong>Correct:</strong> ${escapeHtml(m.answer)}</div>
+            <div class="mini muted" style="margin-top:6px">${escapeHtml(m.explanation)}</div>
+          </div>
+        `).join("");
+      }
+
+      showScreen("resultsScreen");
+    }
+
+    function startFreshGame(){
+      const student = $("#studentName").value.trim();
+      const classCard = $("#classCard").value.trim();
+
+      if(!student || !classCard){
+        alert("Please enter both Student name and Class card before starting.");
+        return;
+      }
+
+      state = {
+        student,
+        classCard,
+        startedAt: nowStamp(),
+        questionSet: buildQuestionSet(),
+        index:0,
+        correct:0,
+        answered:0,
+        misses:[],
+        answeredCurrent:false,
+        timerSec:0,
+        timerId:null
+      };
+
+      $("#tbStarted").textContent = state.startedAt;
+      showScreen("gameScreen");
+      renderQuestion();
+      startTimer();
+      saveState();
+    }
+
+    function restoreSavedGame(saved){
+      state = {
+        ...saved,
+        timerId:null
+      };
+      $("#studentName").value = state.student || "";
+      $("#classCard").value = state.classCard || "";
+      showScreen("gameScreen");
+      renderQuestion();
+      startTimer();
+    }
+
+    // ---------- events ----------
+    $("#startBtn").addEventListener("click", startFreshGame);
+    $("#resetSavedBtn").addEventListener("click", () => {
+      clearState();
+      alert("Saved attempt cleared.");
+    });
+    $("#nextBtn").addEventListener("click", nextQuestion);
+    $("#restartBtn").addEventListener("click", () => {
+      if(confirm("Restart this game with a fresh shuffled run?")){
+        stopTimer();
+        clearState();
+        showScreen("startScreen");
+      }
+    });
+    $("#backBtn").addEventListener("click", goHub);
+    $("#resultsBackBtn").addEventListener("click", goHub);
+    $("#playAgainBtn").addEventListener("click", () => {
+      stopTimer();
+      showScreen("startScreen");
+    });
+
+    // ---------- init ----------
+    (() => {
+      const saved = loadState();
+      if(saved && saved.questionSet && Array.isArray(saved.questionSet) && saved.questionSet.length){
+        const resume = confirm("Resume saved attempt for Civic Engagement Arena?");
+        if(resume){
+          restoreSavedGame(saved);
+        } else {
+          clearState();
+        }
+      }
+    })();
+  </script>
+</body>
+</html>
