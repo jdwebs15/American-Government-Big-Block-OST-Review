@@ -1,0 +1,1184 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Public Policy Simulator — American Government OST Review</title>
+  <link rel="stylesheet" href="../styles.css" />
+  <style>
+    :root{
+      --bg:#0b1220;
+      --panel:#111a2f;
+      --panel2:#0f1730;
+      --text:#e7eefc;
+      --muted:#a8b4cf;
+      --line:rgba(255,255,255,.12);
+      --good:#2bd576;
+      --bad:#ff5c7a;
+      --warn:#ffd166;
+      --accent:#7aa2ff;
+      --shadow:0 18px 55px rgba(0,0,0,.40);
+      --radius:18px;
+      --mono:ui-monospace,SFMono-Regular,Menlo,Monaco,Consolas,"Liberation Mono","Courier New",monospace;
+    }
+    *{box-sizing:border-box}
+    html,body{margin:0;padding:0;background:linear-gradient(180deg,var(--bg),#070b14);color:var(--text);font-family:system-ui,-apple-system,Segoe UI,Roboto,Arial,sans-serif}
+    .wrap{width:min(1180px,94vw);margin:24px auto}
+    .panel{
+      background:linear-gradient(180deg,var(--panel),var(--panel2));
+      border:1px solid var(--line);
+      border-radius:var(--radius);
+      box-shadow:var(--shadow);
+    }
+    .screen{display:none}
+    .screen.active{display:block}
+    .hero{padding:24px}
+    .title{font-size:clamp(1.5rem,2.6vw,2.35rem);font-weight:900;letter-spacing:.2px;margin:0 0 8px}
+    .subtitle{color:var(--muted);line-height:1.45;margin:0}
+    .topbar{
+      display:grid;
+      grid-template-columns:1.35fr repeat(5, minmax(110px,1fr));
+      gap:10px;
+      padding:14px;
+      margin-bottom:16px;
+      align-items:stretch;
+    }
+    .stat{
+      border:1px solid var(--line);
+      border-radius:14px;
+      background:rgba(255,255,255,.04);
+      padding:10px 12px;
+      min-height:68px;
+      display:flex;
+      flex-direction:column;
+      justify-content:center;
+    }
+    .stat .k{font-size:.78rem;color:var(--muted);margin-bottom:4px}
+    .stat .v{font-weight:800;font-size:1rem}
+    .studentCard .v{font-size:.98rem;line-height:1.2}
+    .grid{display:grid;grid-template-columns:320px 1fr;gap:16px}
+    .left,.right{padding:16px}
+    .small{font-size:.9rem;color:var(--muted)}
+    button{
+      appearance:none;border:0;cursor:pointer;
+      color:#08111f;font-weight:900;border-radius:12px;padding:12px 16px;
+      background:linear-gradient(180deg,#dfe8ff,#b8ccff);
+      box-shadow:0 10px 25px rgba(0,0,0,.25);
+    }
+    button.secondary{
+      color:var(--text);
+      background:linear-gradient(180deg,#1a2747,#13203c);
+      border:1px solid var(--line);
+      box-shadow:none;
+    }
+    button.warn{background:linear-gradient(180deg,#fff2bf,#ffd166)}
+    .card{
+      background:rgba(255,255,255,.035);
+      border:1px solid var(--line);
+      border-radius:16px;
+      padding:14px;
+    }
+    .label{font-size:.78rem;color:var(--muted);text-transform:uppercase;letter-spacing:.08em}
+    .gameName{font-size:1.2rem;font-weight:900;margin:4px 0 10px}
+    .input{
+      width:100%;margin-top:6px;
+      background:#0d162a;color:var(--text);border:1px solid var(--line);
+      border-radius:12px;padding:12px 14px;font:inherit;
+    }
+    .chips{display:flex;flex-wrap:wrap;gap:8px;margin-top:8px}
+    .chip{
+      font-size:.8rem;padding:7px 10px;border-radius:999px;
+      background:rgba(122,162,255,.12);border:1px solid rgba(122,162,255,.28);color:#dfe8ff;
+    }
+    .qwrap{padding:18px}
+    .qhead{display:flex;justify-content:space-between;gap:12px;align-items:flex-start;margin-bottom:10px}
+    .qnum{font-size:.85rem;color:var(--muted);font-weight:800;letter-spacing:.06em;text-transform:uppercase}
+    .qstd{font-size:.8rem;color:#cfe0ff;background:rgba(122,162,255,.13);border:1px solid rgba(122,162,255,.25);padding:6px 10px;border-radius:999px;white-space:nowrap}
+    .passage{
+      margin:10px 0 14px;
+      background:rgba(255,255,255,.03);
+      border-left:4px solid rgba(122,162,255,.7);
+      border-radius:12px;
+      padding:14px 14px 14px 16px;
+      line-height:1.55;
+      color:#deebff;
+    }
+    .question{font-size:1.08rem;line-height:1.45;font-weight:750;margin:0 0 14px}
+    .choices{display:grid;gap:10px}
+    .choice{
+      width:100%;text-align:left;border:1px solid var(--line);
+      background:rgba(255,255,255,.04);color:var(--text);border-radius:14px;
+      padding:14px 14px 14px 48px;position:relative;font-weight:700;
+      box-shadow:none;
+      transition:background .15s ease, border-color .15s ease, transform .08s ease;
+    }
+    .choice::before{
+      content:attr(data-letter);
+      position:absolute;left:14px;top:50%;transform:translateY(-50%);
+      width:22px;height:22px;border-radius:50%;
+      background:rgba(255,255,255,.08);border:1px solid var(--line);
+      display:grid;place-items:center;color:#dce7ff;font-size:.82rem;font-weight:900;
+    }
+    .choice:hover{background:rgba(255,255,255,.07)}
+    .choice:active{transform:translateY(1px)}
+    .choice.correct{border-color:rgba(43,213,118,.45);background:rgba(43,213,118,.12)}
+    .choice.incorrect{border-color:rgba(255,92,122,.45);background:rgba(255,92,122,.12)}
+    .choice.dimmed{opacity:.5}
+    .feedback{
+      margin-top:14px;border-radius:14px;padding:14px;border:1px solid var(--line);
+      background:rgba(255,255,255,.04);display:none
+    }
+    .feedback.show{display:block}
+    .feedback.good{border-color:rgba(43,213,118,.35);background:rgba(43,213,118,.10)}
+    .feedback.bad{border-color:rgba(255,209,102,.35);background:rgba(255,209,102,.10)}
+    .feedback .lead{font-weight:900;margin-bottom:6px}
+    .feedback .hint{color:#fff3c7}
+    .sideTitle{font-size:1rem;font-weight:900;margin:0 0 8px}
+    .rules ul,.coverage ul{margin:8px 0 0 18px;padding:0}
+    .rules li,.coverage li{margin:6px 0;line-height:1.4}
+    .progressBar{
+      width:100%;height:12px;border-radius:999px;background:rgba(255,255,255,.07);
+      border:1px solid var(--line);overflow:hidden
+    }
+    .progressFill{
+      height:100%;width:0%;
+      background:linear-gradient(90deg,#79a6ff,#2bd576);
+      transition:width .25s ease;
+    }
+    .legend{
+      display:flex;justify-content:space-between;gap:12px;color:var(--muted);
+      font-size:.9rem;margin-top:8px
+    }
+    .footBtns{display:flex;gap:10px;flex-wrap:wrap;margin-top:14px}
+    .results{padding:24px}
+    .scoreBig{font-size:clamp(2rem,5vw,3rem);font-weight:1000;line-height:1;margin:4px 0 8px}
+    .resultGrid{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin-top:16px}
+    .resultBox{
+      border:1px solid var(--line);border-radius:16px;padding:14px;background:rgba(255,255,255,.04)
+    }
+    .missedList{display:grid;gap:10px;margin-top:16px}
+    .missedItem{
+      border:1px solid var(--line);border-radius:14px;padding:12px;background:rgba(255,255,255,.035)
+    }
+    .muted{color:var(--muted)}
+    .mini{font-size:.86rem}
+    .mono{font-family:var(--mono)}
+    .badge{
+      display:inline-block;padding:6px 10px;border-radius:999px;
+      border:1px solid var(--line);background:rgba(255,255,255,.05);font-size:.8rem;font-weight:800
+    }
+    .goodText{color:#93f0b7}
+    .warnText{color:#ffe28b}
+    .badText{color:#ffafc0}
+    @media (max-width: 980px){
+      .topbar{grid-template-columns:1fr 1fr}
+      .grid{grid-template-columns:1fr}
+      .resultGrid{grid-template-columns:1fr 1fr}
+    }
+    @media (max-width: 640px){
+      .wrap{width:min(96vw,96vw);margin:12px auto}
+      .topbar{grid-template-columns:1fr}
+      .resultGrid{grid-template-columns:1fr}
+      .qhead{flex-direction:column;align-items:flex-start}
+      .left,.right,.qwrap,.hero,.results{padding:14px}
+    }
+  </style>
+</head>
+<body>
+  <div class="wrap">
+
+    <section id="startScreen" class="screen active panel">
+      <div class="hero">
+        <div class="label">American Government OST Review</div>
+        <h1 class="title">Public Policy Simulator</h1>
+        <p class="subtitle">
+          Friday Big Block Review • Content Statements 17–21<br>
+          Ohio civic roles, public policy, policy input, fiscal policy, and monetary policy.
+        </p>
+      </div>
+
+      <div class="grid">
+        <div class="left">
+          <div class="card">
+            <div class="label">Game HTML Name</div>
+            <div class="gameName">public-policy-simulator.html</div>
+            <div class="small">Drop this file into your Government hub games folder.</div>
+          </div>
+
+          <div class="card" style="margin-top:14px">
+            <div class="label">Student Sign In</div>
+            <input id="studentName" class="input" type="text" placeholder="Student name" maxlength="40" />
+            <input id="classCard" class="input" type="text" placeholder="Class card / period" maxlength="40" />
+            <div class="chips">
+              <span class="chip">30 questions</span>
+              <span class="chip">Shuffled order</span>
+              <span class="chip">Shuffled answers</span>
+              <span class="chip">Hint on miss</span>
+              <span class="chip">Auto-advance on correct</span>
+            </div>
+            <div class="footBtns">
+              <button id="startBtn">Start Game</button>
+              <button id="resetSavedBtn" class="secondary">Reset Saved Attempt</button>
+            </div>
+          </div>
+        </div>
+
+        <div class="right">
+          <div class="card rules">
+            <h2 class="sideTitle">How it works</h2>
+            <ul>
+              <li>Read each question and scenario carefully.</li>
+              <li>If you answer correctly, the game auto-advances.</li>
+              <li>If you miss, you get a hint and must choose again.</li>
+              <li>The hint helps narrow the concept, but does <strong>not</strong> reveal the answer.</li>
+              <li>Student, class card, progress, accuracy, timer, and started time stay visible during the game.</li>
+            </ul>
+          </div>
+
+          <div class="card coverage" style="margin-top:14px">
+            <h2 class="sideTitle">Content coverage</h2>
+            <ul>
+              <li><strong>CS 17:</strong> Ohio citizens helping state and local government</li>
+              <li><strong>CS 18:</strong> Public policy issues across branches and levels</li>
+              <li><strong>CS 19:</strong> Effective input by individuals and organizations</li>
+              <li><strong>CS 20:</strong> Fiscal policy and regulation</li>
+              <li><strong>CS 21:</strong> Monetary policy and the Federal Reserve</li>
+            </ul>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section id="gameScreen" class="screen">
+      <div class="panel topbar">
+        <div class="stat studentCard">
+          <div class="k">Student</div>
+          <div class="v" id="tbStudent">—</div>
+        </div>
+        <div class="stat">
+          <div class="k">Class Card</div>
+          <div class="v" id="tbClass">—</div>
+        </div>
+        <div class="stat">
+          <div class="k">Progress</div>
+          <div class="v" id="tbProgress">0 / 30</div>
+        </div>
+        <div class="stat">
+          <div class="k">Accuracy</div>
+          <div class="v" id="tbAccuracy">100%</div>
+        </div>
+        <div class="stat">
+          <div class="k">Timer</div>
+          <div class="v mono" id="tbTimer">00:00</div>
+        </div>
+        <div class="stat">
+          <div class="k">Started</div>
+          <div class="v mono mini" id="tbStarted">—</div>
+        </div>
+      </div>
+
+      <div class="grid">
+        <aside class="left panel">
+          <div class="card">
+            <div class="label">Game</div>
+            <div class="gameName">Public Policy Simulator</div>
+            <div class="small">Big Block Friday review for CS 17–21.</div>
+          </div>
+
+          <div class="card" style="margin-top:14px">
+            <div class="label">Progress Bar</div>
+            <div class="progressBar" aria-label="progress">
+              <div class="progressFill" id="progressFill"></div>
+            </div>
+            <div class="legend">
+              <span id="legendLeft">Question 1 of 30</span>
+              <span id="legendRight">Mastery Run</span>
+            </div>
+          </div>
+
+          <div class="card" style="margin-top:14px">
+            <div class="label">Rules</div>
+            <ul class="mini" style="margin:8px 0 0 18px;padding:0">
+              <li>One best answer per question.</li>
+              <li>On a miss, a hint appears and you choose again.</li>
+              <li>Auto-advance happens only after the correct answer.</li>
+              <li>Questions and answer choices are shuffled each new run.</li>
+              <li>Restart is available for a fresh mastery attempt.</li>
+            </ul>
+          </div>
+
+          <div class="footBtns" style="margin-top:14px">
+            <button id="restartBtn" class="warn">Restart</button>
+            <button id="backBtn" class="secondary">Back to Hub</button>
+          </div>
+        </aside>
+
+        <main class="right panel">
+          <div class="qwrap">
+            <div class="qhead">
+              <div>
+                <div class="qnum" id="qNum">Question 1</div>
+                <h2 class="question" id="qText">Loading...</h2>
+              </div>
+              <div class="qstd" id="qStandard">CS 17</div>
+            </div>
+
+            <div id="qPassage" class="passage" style="display:none"></div>
+
+            <div id="choices" class="choices"></div>
+
+            <div id="feedback" class="feedback">
+              <div class="lead" id="fbLead"></div>
+              <div id="fbExplain"></div>
+              <div class="hint" id="fbHint" style="margin-top:8px"></div>
+            </div>
+          </div>
+        </main>
+      </div>
+    </section>
+
+    <section id="resultsScreen" class="screen panel">
+      <div class="results">
+        <div class="label">Results</div>
+        <div class="scoreBig" id="finalScore">0 / 30</div>
+        <div class="muted" id="finalMessage">Nice work.</div>
+
+        <div class="resultGrid">
+          <div class="resultBox">
+            <div class="label">Student</div>
+            <div class="gameName" id="resStudent">—</div>
+          </div>
+          <div class="resultBox">
+            <div class="label">Class Card</div>
+            <div class="gameName" id="resClass">—</div>
+          </div>
+          <div class="resultBox">
+            <div class="label">Accuracy</div>
+            <div class="gameName" id="resAccuracy">0%</div>
+          </div>
+          <div class="resultBox">
+            <div class="label">Time</div>
+            <div class="gameName mono" id="resTime">00:00</div>
+          </div>
+        </div>
+
+        <div class="card" style="margin-top:16px">
+          <div class="label">Standards hit</div>
+          <div class="chips" style="margin-top:10px">
+            <span class="chip">CS 17 Ohio Civic Roles</span>
+            <span class="chip">CS 18 Public Policy</span>
+            <span class="chip">CS 19 Policy Input</span>
+            <span class="chip">CS 20 Fiscal Policy</span>
+            <span class="chip">CS 21 Monetary Policy</span>
+          </div>
+        </div>
+
+        <div class="card" style="margin-top:16px">
+          <div class="label">Missed Questions Review</div>
+          <div id="missedList" class="missedList">
+            <div class="muted">Perfect run — no misses to review.</div>
+          </div>
+        </div>
+
+        <div class="footBtns">
+          <button id="playAgainBtn">Play Again</button>
+          <button id="resultsBackBtn" class="secondary">Back to Hub</button>
+        </div>
+      </div>
+    </section>
+
+  </div>
+
+  <script>
+    const TOTAL_QUESTIONS = 30;
+    const STORAGE_KEY = "gov_ost_public_policy_simulator_v1";
+    const AUTO_ADVANCE_DELAY = 700;
+
+    const QUESTION_BANK = [
+      {
+        standard:"CS 17",
+        passage:"Residents in an Ohio town are concerned about flooding on a neighborhood road.",
+        question:"Which action best shows a citizen helping local government address the problem?",
+        choices:[
+          "Attending a local board meeting and presenting concerns",
+          "Ratifying a treaty",
+          "Appointing a federal judge",
+          "Issuing an executive order"
+        ],
+        answer:"Attending a local board meeting and presenting concerns",
+        explanation:"CS 17 emphasizes that citizens can help local government by attending meetings and participating in community problem-solving.",
+        hint:"Look for direct involvement with the local body that can actually respond."
+      },
+      {
+        standard:"CS 17",
+        passage:"A citizen wants to play a role in Ohio state government beyond just voting.",
+        question:"Which option best fits the standards?",
+        choices:[
+          "Running for state office",
+          "Appointing Supreme Court justices",
+          "Writing federal treaties",
+          "Reviewing federal appeals"
+        ],
+        answer:"Running for state office",
+        explanation:"Running for state office is one of the roles listed in the standards.",
+        hint:"The answer should involve state-level civic participation."
+      },
+      {
+        standard:"CS 17",
+        passage:"An Ohio community needs more volunteer emergency support.",
+        question:"Which action best reflects the standards’ examples of local involvement?",
+        choices:[
+          "Serving in a volunteer fire department",
+          "Printing money",
+          "Approving ambassadors",
+          "Declaring war"
+        ],
+        answer:"Serving in a volunteer fire department",
+        explanation:"The standards specifically list volunteer fire department service as a local role citizens can play.",
+        hint:"Look for the role directly tied to local community service."
+      },
+      {
+        standard:"CS 17",
+        passage:"A group of Ohio residents wants to help address crime concerns in their neighborhood.",
+        question:"Which action best fits the local roles named in the standards?",
+        choices:[
+          "Joining a community watch group",
+          "Changing Federal Reserve policy",
+          "Approving a constitutional amendment",
+          "Nominating a cabinet official"
+        ],
+        answer:"Joining a community watch group",
+        explanation:"Community watch groups are specifically named as a local example in CS 17.",
+        hint:"The right answer should be neighborhood-level involvement."
+      },
+      {
+        standard:"CS 17",
+        passage:"A citizen signs a petition to place an issue on the ballot in Ohio.",
+        question:"This most directly reflects",
+        choices:[
+          "a state-level role citizens can play in addressing problems",
+          "judicial review",
+          "federal supremacy",
+          "monetary contraction"
+        ],
+        answer:"a state-level role citizens can play in addressing problems",
+        explanation:"Signing petitions to place issues on the ballot is listed as a state-level role.",
+        hint:"Think ballot access and Ohio civic participation."
+      },
+      {
+        standard:"CS 17",
+        passage:"A student is asked to explain how Ohio citizens can help government solve problems.",
+        question:"Which response best fits the expectation for learning?",
+        choices:[
+          "Citizens can vote, pay taxes, attend meetings, run for office, and serve in community roles",
+          "Citizens can only vote in national elections",
+          "Citizens may not help with controversial issues",
+          "Citizens can act only through courts"
+        ],
+        answer:"Citizens can vote, pay taxes, attend meetings, run for office, and serve in community roles",
+        explanation:"That answer reflects the range of roles listed in CS 17.",
+        hint:"The best answer includes multiple practical forms of civic involvement."
+      },
+      {
+        standard:"CS 18",
+        passage:"A county commission considers granting a tax abatement to attract a new employer.",
+        question:"This is best described as",
+        choices:[
+          "a local public policy issue",
+          "a constitutional amendment",
+          "a federal judicial power",
+          "a party platform only"
+        ],
+        answer:"a local public policy issue",
+        explanation:"County commissions granting tax abatements are specifically listed as local public policy examples.",
+        hint:"This is about government action on a debated issue."
+      },
+      {
+        standard:"CS 18",
+        passage:"The Department of State advises the president on foreign policy and directs embassies abroad.",
+        question:"Which level and branch does this example represent?",
+        choices:[
+          "Federal executive",
+          "State judicial",
+          "Local legislative",
+          "Federal judicial"
+        ],
+        answer:"Federal executive",
+        explanation:"The Department of State is a federal executive example in the standards.",
+        hint:"Think national-level executive policymaking."
+      },
+      {
+        standard:"CS 18",
+        passage:"The Ohio Legislative Service Commission helps draft legislation.",
+        question:"This best illustrates",
+        choices:[
+          "state legislative public policy work",
+          "federal judicial review",
+          "local executive enforcement",
+          "direct democracy only"
+        ],
+        answer:"state legislative public policy work",
+        explanation:"The Ohio Legislative Service Commission is listed as a state legislative example.",
+        hint:"Focus on the state-level lawmaking process."
+      },
+      {
+        standard:"CS 18",
+        passage:"A policy issue involves city zoning, state environmental rules, and federal transportation funding.",
+        question:"What does this best show?",
+        choices:[
+          "Public policy issues can involve multiple levels of government at once",
+          "Only local government matters in policy disputes",
+          "Only courts can address complex issues",
+          "Public policy never involves collaboration"
+        ],
+        answer:"Public policy issues can involve multiple levels of government at once",
+        explanation:"CS 18 emphasizes that public policy issues can involve collaboration or conflict across levels and branches.",
+        hint:"Look for the answer that includes multiple governments together."
+      },
+      {
+        standard:"CS 18",
+        passage:"A state court applies sentencing guidelines in felony cases.",
+        question:"Which example from the standards does this most closely match?",
+        choices:[
+          "State judicial role in public policy",
+          "Federal executive role in public policy",
+          "Local legislative role in public policy",
+          "National party role in elections"
+        ],
+        answer:"State judicial role in public policy",
+        explanation:"The Ohio Courts of Common Pleas are given as a state judicial example.",
+        hint:"The clue is state court application of rules."
+      },
+      {
+        standard:"CS 18",
+        passage:"A student is asked to analyze a public policy issue in terms of collaboration or conflict.",
+        question:"Which answer best fits that task?",
+        choices:[
+          "Explain which levels and branches are involved and whether they are working together or disagreeing",
+          "Memorize the names of cabinet secretaries",
+          "List all constitutional amendments",
+          "Name only one official without context"
+        ],
+        answer:"Explain which levels and branches are involved and whether they are working together or disagreeing",
+        explanation:"That matches the expectation for learning in CS 18.",
+        hint:"The best answer identifies actors and their relationship."
+      },
+      {
+        standard:"CS 19",
+        passage:"A business group meets with lawmakers to urge support for a new tax policy.",
+        question:"This is best described as",
+        choices:[
+          "lobbying the legislative branch",
+          "judicial review",
+          "executive enforcement",
+          "monetary policy"
+        ],
+        answer:"lobbying the legislative branch",
+        explanation:"Lobbying legislators is one of the input methods listed in CS 19.",
+        hint:"Think about trying to influence lawmakers directly."
+      },
+      {
+        standard:"CS 19",
+        passage:"An environmental organization submits comments to executive officials about proposed regulations.",
+        question:"Which branch is the organization trying to influence most directly?",
+        choices:[
+          "Executive branch",
+          "Judicial branch",
+          "Legislative branch",
+          "Electoral college"
+        ],
+        answer:"Executive branch",
+        explanation:"Providing input on proposed rules is aimed at executive branch officials.",
+        hint:"Regulations and rulemaking point to one branch."
+      },
+      {
+        standard:"CS 19",
+        passage:"A legal advocacy group files a brief in a court case involving voting rights.",
+        question:"Which branch is the group engaging?",
+        choices:[
+          "Judicial branch",
+          "Executive branch",
+          "Legislative branch",
+          "Local zoning board"
+        ],
+        answer:"Judicial branch",
+        explanation:"Preparing briefs during judicial proceedings is a listed method in CS 19.",
+        hint:"A brief is filed in court."
+      },
+      {
+        standard:"CS 19",
+        passage:"A community coalition organizes a letter-writing campaign about housing policy.",
+        question:"What is this an example of?",
+        choices:[
+          "An organization using a public input method to influence policy",
+          "A court imposing a sentence",
+          "The Federal Reserve changing interest rates",
+          "The Senate ratifying a treaty"
+        ],
+        answer:"An organization using a public input method to influence policy",
+        explanation:"Letter-writing campaigns are specifically listed in CS 19.",
+        hint:"This is about outside groups trying to influence government action."
+      },
+      {
+        standard:"CS 19",
+        passage:"A group wants to influence foreign policy decisions.",
+        question:"Which target would likely be most appropriate?",
+        choices:[
+          "The federal executive branch, such as the Department of State",
+          "A township zoning board",
+          "A local parks department",
+          "A county recorder"
+        ],
+        answer:"The federal executive branch, such as the Department of State",
+        explanation:"Foreign policy is generally addressed at the federal executive level.",
+        hint:"Think national and international affairs."
+      },
+      {
+        standard:"CS 19",
+        passage:"A student is asked to defend a position on a policy issue and choose an effective approach for input.",
+        question:"Which response best fits the standard?",
+        choices:[
+          "Match the issue to the proper level and branch of government, then select an input method such as testimony or lobbying",
+          "Send every issue to the Supreme Court first",
+          "Ignore which agency or branch has authority",
+          "Use the same approach regardless of the issue"
+        ],
+        answer:"Match the issue to the proper level and branch of government, then select an input method such as testimony or lobbying",
+        explanation:"That directly matches the expectation for learning in CS 19.",
+        hint:"Effective input depends on knowing who can act."
+      },
+      {
+        standard:"CS 20",
+        passage:"The federal government increases spending on infrastructure during a recession.",
+        question:"This is an example of",
+        choices:[
+          "fiscal policy used to encourage economic growth",
+          "monetary policy used to slow the economy",
+          "judicial policy",
+          "state-only economic regulation"
+        ],
+        answer:"fiscal policy used to encourage economic growth",
+        explanation:"Increasing spending is a classic fiscal policy tool for stimulating growth.",
+        hint:"This question is about taxing and spending, not the money supply."
+      },
+      {
+        standard:"CS 20",
+        passage:"The government raises taxes because it wants to cool down an overheating economy.",
+        question:"This is best described as",
+        choices:[
+          "fiscal policy used to slow economic growth",
+          "monetary policy used to encourage growth",
+          "judicial restraint",
+          "a constitutional amendment"
+        ],
+        answer:"fiscal policy used to slow economic growth",
+        explanation:"Increasing taxes is one fiscal approach to slowing growth.",
+        hint:"Higher taxes fit one specific type of economic tool."
+      },
+      {
+        standard:"CS 20",
+        passage:"Congress debates whether a new consumer protection rule will help buyers but also increase costs for firms.",
+        question:"What idea from CS 20 is most clearly shown?",
+        choices:[
+          "Regulation can create both benefits and costs",
+          "Regulation never affects economic growth",
+          "Consumer protection is unrelated to the economy",
+          "Only courts regulate business activity"
+        ],
+        answer:"Regulation can create both benefits and costs",
+        explanation:"CS 20 emphasizes that regulatory action carries economic costs and benefits.",
+        hint:"Think tradeoffs."
+      },
+      {
+        standard:"CS 20",
+        passage:"A new rule prevents deceptive business practices in lending.",
+        question:"Which possible regulatory benefit does this best illustrate?",
+        choices:[
+          "Consumer protection",
+          "Automatic tax cuts",
+          "Permanent elimination of recession",
+          "Removal of all business costs"
+        ],
+        answer:"Consumer protection",
+        explanation:"The standards mention consumer protections as a benefit of regulation.",
+        hint:"The rule protects buyers from unfair treatment."
+      },
+      {
+        standard:"CS 20",
+        passage:"A student is asked to explain fiscal policy.",
+        question:"Which answer is best?",
+        choices:[
+          "Government decisions about taxing and spending to affect economic conditions",
+          "Federal Reserve decisions about reserve requirements and bond sales",
+          "Court rulings about contracts",
+          "State constitutions regulating elections"
+        ],
+        answer:"Government decisions about taxing and spending to affect economic conditions",
+        explanation:"That is the definition of fiscal policy in CS 20.",
+        hint:"Fiscal policy is not the same as Federal Reserve action."
+      },
+      {
+        standard:"CS 21",
+        passage:"The Federal Reserve lowers interest rates to make borrowing easier.",
+        question:"What is the likely goal of this action?",
+        choices:[
+          "Encourage economic growth",
+          "Slow economic growth",
+          "Raise taxes",
+          "Reduce federal spending"
+        ],
+        answer:"Encourage economic growth",
+        explanation:"Lower interest rates generally stimulate borrowing and growth.",
+        hint:"Cheaper borrowing usually pushes the economy in one direction."
+      },
+      {
+        standard:"CS 21",
+        passage:"The Federal Reserve raises reserve requirements for banks.",
+        question:"What is the likely purpose of this action?",
+        choices:[
+          "Slow economic growth",
+          "Encourage faster growth",
+          "Expand the money supply quickly",
+          "Cut business regulations"
+        ],
+        answer:"Slow economic growth",
+        explanation:"Higher reserve requirements reduce available lending and can slow growth.",
+        hint:"Less lending usually means less economic expansion."
+      },
+      {
+        standard:"CS 21",
+        passage:"The Federal Reserve buys bonds on the open market.",
+        question:"This is generally intended to",
+        choices:[
+          "encourage economic growth",
+          "reduce the money supply",
+          "increase taxes",
+          "pass new legislation"
+        ],
+        answer:"encourage economic growth",
+        explanation:"Buying bonds injects money and tends to encourage growth.",
+        hint:"Ask whether buying bonds adds or removes money from circulation."
+      },
+      {
+        standard:"CS 21",
+        passage:"The Federal Reserve sells bonds.",
+        question:"This action is generally used to",
+        choices:[
+          "slow economic growth",
+          "encourage borrowing",
+          "reduce taxes",
+          "expand consumer protections"
+        ],
+        answer:"slow economic growth",
+        explanation:"Selling bonds helps reduce money in circulation and can slow growth.",
+        hint:"Selling bonds pulls money the opposite direction from buying bonds."
+      },
+      {
+        standard:"CS 21",
+        passage:"A student wants to compare monetary policy and fiscal policy.",
+        question:"Which statement is most accurate?",
+        choices:[
+          "Monetary policy regulates the money supply, while fiscal policy uses taxing and spending",
+          "Both are controlled by the Supreme Court",
+          "Fiscal policy is made only by state governments",
+          "Monetary policy is the same as direct democracy"
+        ],
+        answer:"Monetary policy regulates the money supply, while fiscal policy uses taxing and spending",
+        explanation:"This is the clearest distinction between CS 20 and CS 21.",
+        hint:"One is about money supply; the other is about taxes and spending."
+      },
+      {
+        standard:"CS 21",
+        passage:"The Federal Reserve wants banks to lend more freely.",
+        question:"Which action would best support that goal?",
+        choices:[
+          "Lower reserve requirements",
+          "Raise reserve requirements",
+          "Sell bonds",
+          "Raise interest rates"
+        ],
+        answer:"Lower reserve requirements",
+        explanation:"Lower reserve requirements leave banks with more available funds to lend.",
+        hint:"More lending requires banks to hold back less money."
+      },
+      {
+        standard:"CS 21",
+        passage:"A teacher asks how the Federal Reserve can slow expansion in the economy.",
+        question:"Which answer is best?",
+        choices:[
+          "Raise interest rates, increase reserve requirements, or sell bonds",
+          "Cut taxes and increase spending",
+          "Pass a constitutional amendment",
+          "Override a presidential veto"
+        ],
+        answer:"Raise interest rates, increase reserve requirements, or sell bonds",
+        explanation:"Those are the contractionary monetary tools named in CS 21.",
+        hint:"Pick the answer with the Federal Reserve tools, not Congress's tax-and-spend tools."
+      }
+    ];
+
+    const $ = sel => document.querySelector(sel);
+
+    function shuffleArray(arr){
+      const a = arr.slice();
+      for(let i=a.length-1;i>0;i--){
+        const j = Math.floor(Math.random()*(i+1));
+        [a[i],a[j]] = [a[j],a[i]];
+      }
+      return a;
+    }
+
+    function formatTime(sec){
+      const m = Math.floor(sec/60).toString().padStart(2,'0');
+      const s = Math.floor(sec%60).toString().padStart(2,'0');
+      return `${m}:${s}`;
+    }
+
+    function nowStamp(){
+      const d = new Date();
+      return d.toLocaleString([], {
+        year:'2-digit', month:'2-digit', day:'2-digit',
+        hour:'2-digit', minute:'2-digit'
+      });
+    }
+
+    function escapeHtml(str){
+      return String(str)
+        .replaceAll('&','&amp;')
+        .replaceAll('<','&lt;')
+        .replaceAll('>','&gt;')
+        .replaceAll('"','&quot;')
+        .replaceAll("'","&#39;");
+    }
+
+    function goHub(){
+      window.location.href = "../index.html";
+    }
+
+    let state = {
+      student:"",
+      classCard:"",
+      startedAt:"",
+      questionSet:[],
+      index:0,
+      correct:0,
+      answered:0,
+      misses:[],
+      answeredCurrent:false,
+      attemptsOnCurrent:0,
+      timerSec:0,
+      timerId:null,
+      autoAdvanceId:null
+    };
+
+    function buildQuestionSet(){
+      return shuffleArray(QUESTION_BANK).slice(0, TOTAL_QUESTIONS).map(q => ({
+        ...q,
+        shuffledChoices: shuffleArray(q.choices)
+      }));
+    }
+
+    function saveState(){
+      const safe = {
+        ...state,
+        timerId:null,
+        autoAdvanceId:null
+      };
+      localStorage.setItem(STORAGE_KEY, JSON.stringify(safe));
+    }
+
+    function loadState(){
+      try{
+        const raw = localStorage.getItem(STORAGE_KEY);
+        if(!raw) return null;
+        return JSON.parse(raw);
+      }catch(e){
+        return null;
+      }
+    }
+
+    function clearState(){
+      localStorage.removeItem(STORAGE_KEY);
+    }
+
+    function startTimer(){
+      stopTimer();
+      state.timerId = setInterval(() => {
+        state.timerSec++;
+        $("#tbTimer").textContent = formatTime(state.timerSec);
+        saveState();
+      }, 1000);
+    }
+
+    function stopTimer(){
+      if(state.timerId) clearInterval(state.timerId);
+      state.timerId = null;
+      if(state.autoAdvanceId) clearTimeout(state.autoAdvanceId);
+      state.autoAdvanceId = null;
+    }
+
+    function showScreen(id){
+      ["startScreen","gameScreen","resultsScreen"].forEach(s => {
+        document.getElementById(s).classList.toggle("active", s===id);
+      });
+    }
+
+    function updateTopbar(){
+      $("#tbStudent").textContent = state.student || "—";
+      $("#tbClass").textContent = state.classCard || "—";
+      $("#tbProgress").textContent = `${state.answered} / ${TOTAL_QUESTIONS}`;
+      const acc = state.answered ? Math.round((state.correct / state.answered) * 100) : 100;
+      $("#tbAccuracy").textContent = `${acc}%`;
+      $("#tbTimer").textContent = formatTime(state.timerSec);
+      $("#tbStarted").textContent = state.startedAt || "—";
+      $("#progressFill").style.width = `${(state.answered / TOTAL_QUESTIONS) * 100}%`;
+      $("#legendLeft").textContent = `Question ${Math.min(state.index + 1, TOTAL_QUESTIONS)} of ${TOTAL_QUESTIONS}`;
+      $("#legendRight").textContent = acc === 100 ? "Mastery Run" : "Keep Grinding";
+    }
+
+    function renderQuestion(){
+      updateTopbar();
+
+      const q = state.questionSet[state.index];
+      if(!q){
+        finishGame();
+        return;
+      }
+
+      $("#qNum").textContent = `Question ${state.index + 1}`;
+      $("#qText").textContent = q.question;
+      $("#qStandard").textContent = q.standard;
+
+      const passageEl = $("#qPassage");
+      if(q.passage && q.passage.trim()){
+        passageEl.style.display = "block";
+        passageEl.innerHTML = escapeHtml(q.passage);
+      } else {
+        passageEl.style.display = "none";
+        passageEl.textContent = "";
+      }
+
+      const choicesEl = $("#choices");
+      choicesEl.innerHTML = "";
+      const letters = ["A","B","C","D"];
+
+      q.shuffledChoices.forEach((choice, i) => {
+        const btn = document.createElement("button");
+        btn.className = "choice";
+        btn.type = "button";
+        btn.dataset.letter = letters[i];
+        btn.innerHTML = escapeHtml(choice);
+        btn.addEventListener("click", () => handleAnswer(choice, btn));
+        choicesEl.appendChild(btn);
+      });
+
+      state.answeredCurrent = false;
+      state.attemptsOnCurrent = 0;
+
+      const fb = $("#feedback");
+      fb.className = "feedback";
+      fb.innerHTML = `<div class="lead" id="fbLead"></div><div id="fbExplain"></div><div class="hint" id="fbHint" style="margin-top:8px"></div>`;
+
+      saveState();
+    }
+
+    function showFeedback(type, lead, explain, hint){
+      const fb = $("#feedback");
+      fb.className = `feedback show ${type}`;
+      $("#fbLead").textContent = lead;
+      $("#fbExplain").innerHTML = explain || "";
+      $("#fbHint").innerHTML = hint ? `<strong>Hint:</strong> ${escapeHtml(hint)}` : "";
+    }
+
+    function disableAllChoices(){
+      [...document.querySelectorAll(".choice")].forEach(btn => btn.disabled = true);
+    }
+
+    function scheduleAutoAdvance(){
+      if(state.autoAdvanceId) clearTimeout(state.autoAdvanceId);
+      state.autoAdvanceId = setTimeout(() => {
+        nextQuestion();
+      }, AUTO_ADVANCE_DELAY);
+    }
+
+    function handleAnswer(selected, btnEl){
+      if(state.answeredCurrent) return;
+
+      const q = state.questionSet[state.index];
+      const isCorrect = selected === q.answer;
+      state.attemptsOnCurrent++;
+
+      if(isCorrect){
+        state.answeredCurrent = true;
+        state.answered++;
+        state.correct++;
+
+        disableAllChoices();
+
+        [...document.querySelectorAll(".choice")].forEach(btn => {
+          const txt = btn.textContent;
+          if(txt === q.answer) btn.classList.add("correct");
+          else btn.classList.add("dimmed");
+        });
+
+        showFeedback(
+          "good",
+          "Correct",
+          `<div>${escapeHtml(q.explanation)}</div><div style="margin-top:8px"><em>Advancing...</em></div>`,
+          ""
+        );
+
+        updateTopbar();
+        saveState();
+        scheduleAutoAdvance();
+        return;
+      }
+
+      btnEl.classList.add("incorrect");
+      btnEl.disabled = true;
+
+      if(state.attemptsOnCurrent === 1){
+        state.answered++;
+        state.misses.push({
+          standard:q.standard,
+          question:q.question,
+          selected,
+          answer:q.answer,
+          explanation:q.explanation
+        });
+      }
+
+      showFeedback(
+        "bad",
+        "Try again",
+        `<div>${escapeHtml(q.explanation)}</div><div style="margin-top:8px">Use the hint, then choose again.</div>`,
+        q.hint
+      );
+
+      updateTopbar();
+      saveState();
+    }
+
+    function nextQuestion(){
+      state.index++;
+      if(state.index >= TOTAL_QUESTIONS){
+        finishGame();
+      } else {
+        renderQuestion();
+      }
+    }
+
+    function finishGame(){
+      stopTimer();
+      clearState();
+
+      const acc = state.answered ? Math.round((state.correct / state.answered) * 100) : 0;
+      $("#finalScore").textContent = `${state.correct} / ${TOTAL_QUESTIONS}`;
+      $("#finalMessage").innerHTML =
+        acc === 100
+          ? `<span class="goodText">Perfect mastery run.</span> Outstanding work.`
+          : acc >= 85
+            ? `<span class="warnText">Strong run.</span> Review the misses and go again for mastery.`
+            : `<span class="badText">Good start.</span> Review the concepts and restart for a stronger score.`;
+
+      $("#resStudent").textContent = state.student || "—";
+      $("#resClass").textContent = state.classCard || "—";
+      $("#resAccuracy").textContent = `${acc}%`;
+      $("#resTime").textContent = formatTime(state.timerSec);
+
+      const list = $("#missedList");
+      if(!state.misses.length){
+        list.innerHTML = `<div class="muted">Perfect run — no misses to review.</div>`;
+      } else {
+        list.innerHTML = state.misses.map((m, i) => `
+          <div class="missedItem">
+            <div class="badge">${escapeHtml(m.standard)}</div>
+            <div style="margin-top:8px;font-weight:800">${i+1}. ${escapeHtml(m.question)}</div>
+            <div class="mini muted" style="margin-top:6px"><strong>First miss:</strong> ${escapeHtml(m.selected)}</div>
+            <div class="mini" style="margin-top:4px"><strong>Correct answer:</strong> ${escapeHtml(m.answer)}</div>
+            <div class="mini muted" style="margin-top:6px">${escapeHtml(m.explanation)}</div>
+          </div>
+        `).join("");
+      }
+
+      showScreen("resultsScreen");
+    }
+
+    function startFreshGame(){
+      const student = $("#studentName").value.trim();
+      const classCard = $("#classCard").value.trim();
+
+      if(!student || !classCard){
+        alert("Please enter both Student name and Class card before starting.");
+        return;
+      }
+
+      state = {
+        student,
+        classCard,
+        startedAt: nowStamp(),
+        questionSet: buildQuestionSet(),
+        index:0,
+        correct:0,
+        answered:0,
+        misses:[],
+        answeredCurrent:false,
+        attemptsOnCurrent:0,
+        timerSec:0,
+        timerId:null,
+        autoAdvanceId:null
+      };
+
+      $("#tbStarted").textContent = state.startedAt;
+      showScreen("gameScreen");
+      renderQuestion();
+      startTimer();
+      saveState();
+    }
+
+    function restoreSavedGame(saved){
+      state = {
+        ...saved,
+        timerId:null,
+        autoAdvanceId:null
+      };
+      $("#studentName").value = state.student || "";
+      $("#classCard").value = state.classCard || "";
+      showScreen("gameScreen");
+      renderQuestion();
+      startTimer();
+    }
+
+    $("#startBtn").addEventListener("click", startFreshGame);
+    $("#resetSavedBtn").addEventListener("click", () => {
+      clearState();
+      alert("Saved attempt cleared.");
+    });
+    $("#restartBtn").addEventListener("click", () => {
+      if(confirm("Restart this game with a fresh shuffled run?")){
+        stopTimer();
+        clearState();
+        showScreen("startScreen");
+      }
+    });
+    $("#backBtn").addEventListener("click", goHub);
+    $("#resultsBackBtn").addEventListener("click", goHub);
+    $("#playAgainBtn").addEventListener("click", () => {
+      stopTimer();
+      showScreen("startScreen");
+    });
+
+    (() => {
+      const saved = loadState();
+      if(saved && saved.questionSet && Array.isArray(saved.questionSet) && saved.questionSet.length){
+        const resume = confirm("Resume saved attempt for Public Policy Simulator?");
+        if(resume){
+          restoreSavedGame(saved);
+        } else {
+          clearState();
+        }
+      }
+    })();
+  </script>
+</body>
+</html>
