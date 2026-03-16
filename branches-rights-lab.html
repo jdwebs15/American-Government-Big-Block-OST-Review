@@ -1,0 +1,1050 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Branches & Rights Lab — American Government OST Review</title>
+  <link rel="stylesheet" href="../styles.css" />
+  <style>
+    :root{
+      --bg:#0b1220;
+      --panel:#111a2f;
+      --panel2:#0f1730;
+      --text:#e7eefc;
+      --muted:#a8b4cf;
+      --line:rgba(255,255,255,.12);
+      --good:#2bd576;
+      --bad:#ff5c7a;
+      --warn:#ffd166;
+      --accent:#7aa2ff;
+      --shadow:0 18px 55px rgba(0,0,0,.40);
+      --radius:18px;
+      --mono:ui-monospace,SFMono-Regular,Menlo,Monaco,Consolas,"Liberation Mono","Courier New",monospace;
+    }
+    *{box-sizing:border-box}
+    html,body{margin:0;padding:0;background:linear-gradient(180deg,var(--bg),#070b14);color:var(--text);font-family:system-ui,-apple-system,Segoe UI,Roboto,Arial,sans-serif}
+    .wrap{width:min(1180px,94vw);margin:24px auto}
+    .panel{
+      background:linear-gradient(180deg,var(--panel),var(--panel2));
+      border:1px solid var(--line);
+      border-radius:var(--radius);
+      box-shadow:var(--shadow);
+    }
+    .screen{display:none}
+    .screen.active{display:block}
+    .hero{padding:24px}
+    .title{font-size:clamp(1.5rem,2.6vw,2.35rem);font-weight:900;letter-spacing:.2px;margin:0 0 8px}
+    .subtitle{color:var(--muted);line-height:1.45;margin:0}
+    .topbar{
+      display:grid;
+      grid-template-columns:1.5fr repeat(4, minmax(110px,1fr));
+      gap:10px;
+      padding:14px;
+      margin-bottom:16px;
+      align-items:stretch;
+    }
+    .stat{
+      border:1px solid var(--line);
+      border-radius:14px;
+      background:rgba(255,255,255,.04);
+      padding:10px 12px;
+      min-height:68px;
+      display:flex;
+      flex-direction:column;
+      justify-content:center;
+    }
+    .stat .k{font-size:.78rem;color:var(--muted);margin-bottom:4px}
+    .stat .v{font-weight:800;font-size:1rem}
+    .studentCard .v{font-size:.98rem;line-height:1.2}
+    .grid{display:grid;grid-template-columns:320px 1fr;gap:16px}
+    .left,.right{padding:16px}
+    .small{font-size:.9rem;color:var(--muted)}
+    button{
+      appearance:none;border:0;cursor:pointer;
+      color:#08111f;font-weight:900;border-radius:12px;padding:12px 16px;
+      background:linear-gradient(180deg,#dfe8ff,#b8ccff);
+      box-shadow:0 10px 25px rgba(0,0,0,.25);
+    }
+    button.secondary{
+      color:var(--text);
+      background:linear-gradient(180deg,#1a2747,#13203c);
+      border:1px solid var(--line);
+      box-shadow:none;
+    }
+    button.warn{background:linear-gradient(180deg,#fff2bf,#ffd166)}
+    .card{
+      background:rgba(255,255,255,.035);
+      border:1px solid var(--line);
+      border-radius:16px;
+      padding:14px;
+    }
+    .label{font-size:.78rem;color:var(--muted);text-transform:uppercase;letter-spacing:.08em}
+    .gameName{font-size:1.2rem;font-weight:900;margin:4px 0 10px}
+    .input{
+      width:100%;margin-top:6px;
+      background:#0d162a;color:var(--text);border:1px solid var(--line);
+      border-radius:12px;padding:12px 14px;font:inherit;
+    }
+    .chips{display:flex;flex-wrap:wrap;gap:8px;margin-top:8px}
+    .chip{
+      font-size:.8rem;padding:7px 10px;border-radius:999px;
+      background:rgba(122,162,255,.12);border:1px solid rgba(122,162,255,.28);color:#dfe8ff;
+    }
+    .qwrap{padding:18px}
+    .qhead{display:flex;justify-content:space-between;gap:12px;align-items:flex-start;margin-bottom:10px}
+    .qnum{font-size:.85rem;color:var(--muted);font-weight:800;letter-spacing:.06em;text-transform:uppercase}
+    .qstd{font-size:.8rem;color:#cfe0ff;background:rgba(122,162,255,.13);border:1px solid rgba(122,162,255,.25);padding:6px 10px;border-radius:999px;white-space:nowrap}
+    .passage{
+      margin:10px 0 14px;
+      background:rgba(255,255,255,.03);
+      border-left:4px solid rgba(122,162,255,.7);
+      border-radius:12px;
+      padding:14px 14px 14px 16px;
+      line-height:1.55;
+      color:#deebff;
+    }
+    .question{font-size:1.08rem;line-height:1.45;font-weight:750;margin:0 0 14px}
+    .choices{display:grid;gap:10px}
+    .choice{
+      width:100%;text-align:left;border:1px solid var(--line);
+      background:rgba(255,255,255,.04);color:var(--text);border-radius:14px;
+      padding:14px 14px 14px 48px;position:relative;font-weight:700;
+      box-shadow:none;
+      transition:background .15s ease, border-color .15s ease, transform .08s ease;
+    }
+    .choice::before{
+      content:attr(data-letter);
+      position:absolute;left:14px;top:50%;transform:translateY(-50%);
+      width:22px;height:22px;border-radius:50%;
+      background:rgba(255,255,255,.08);border:1px solid var(--line);
+      display:grid;place-items:center;color:#dce7ff;font-size:.82rem;font-weight:900;
+    }
+    .choice:hover{background:rgba(255,255,255,.07)}
+    .choice:active{transform:translateY(1px)}
+    .choice.correct{border-color:rgba(43,213,118,.45);background:rgba(43,213,118,.12)}
+    .choice.incorrect{border-color:rgba(255,92,122,.45);background:rgba(255,92,122,.12)}
+    .choice.dimmed{opacity:.5}
+    .feedback{
+      margin-top:14px;border-radius:14px;padding:14px;border:1px solid var(--line);
+      background:rgba(255,255,255,.04);display:none
+    }
+    .feedback.show{display:block}
+    .feedback.good{border-color:rgba(43,213,118,.35);background:rgba(43,213,118,.10)}
+    .feedback.bad{border-color:rgba(255,209,102,.35);background:rgba(255,209,102,.10)}
+    .feedback .lead{font-weight:900;margin-bottom:6px}
+    .feedback .hint{color:#fff3c7}
+    .sideTitle{font-size:1rem;font-weight:900;margin:0 0 8px}
+    .rules ul,.coverage ul{margin:8px 0 0 18px;padding:0}
+    .rules li,.coverage li{margin:6px 0;line-height:1.4}
+    .progressBar{
+      width:100%;height:12px;border-radius:999px;background:rgba(255,255,255,.07);
+      border:1px solid var(--line);overflow:hidden
+    }
+    .progressFill{
+      height:100%;width:0%;
+      background:linear-gradient(90deg,#79a6ff,#2bd576);
+      transition:width .25s ease;
+    }
+    .legend{
+      display:flex;justify-content:space-between;gap:12px;color:var(--muted);
+      font-size:.9rem;margin-top:8px
+    }
+    .footBtns{display:flex;gap:10px;flex-wrap:wrap;margin-top:14px}
+    .results{padding:24px}
+    .scoreBig{font-size:clamp(2rem,5vw,3rem);font-weight:1000;line-height:1;margin:4px 0 8px}
+    .resultGrid{display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin-top:16px}
+    .resultBox{
+      border:1px solid var(--line);border-radius:16px;padding:14px;background:rgba(255,255,255,.04)
+    }
+    .missedList{display:grid;gap:10px;margin-top:16px}
+    .missedItem{
+      border:1px solid var(--line);border-radius:14px;padding:12px;background:rgba(255,255,255,.035)
+    }
+    .muted{color:var(--muted)}
+    .mini{font-size:.86rem}
+    .mono{font-family:var(--mono)}
+    .badge{
+      display:inline-block;padding:6px 10px;border-radius:999px;
+      border:1px solid var(--line);background:rgba(255,255,255,.05);font-size:.8rem;font-weight:800
+    }
+    .goodText{color:#93f0b7}
+    .warnText{color:#ffe28b}
+    .badText{color:#ffafc0}
+    @media (max-width: 980px){
+      .topbar{grid-template-columns:1fr 1fr}
+      .grid{grid-template-columns:1fr}
+      .resultGrid{grid-template-columns:1fr 1fr}
+    }
+    @media (max-width: 640px){
+      .wrap{width:min(96vw,96vw);margin:12px auto}
+      .topbar{grid-template-columns:1fr}
+      .resultGrid{grid-template-columns:1fr}
+      .qhead{flex-direction:column;align-items:flex-start}
+      .left,.right,.qwrap,.hero,.results{padding:14px}
+    }
+  </style>
+</head>
+<body>
+  <div class="wrap">
+
+    <section id="startScreen" class="screen active panel">
+      <div class="hero">
+        <div class="label">American Government OST Review</div>
+        <h1 class="title">Branches & Rights Lab</h1>
+        <p class="subtitle">
+          Thursday Big Block Review • Content Statements 12–16<br>
+          Branch powers, checks and balances, rights and responsibilities, civil rights, and the Ohio Constitution.
+        </p>
+      </div>
+
+      <div class="grid">
+        <div class="left">
+          <div class="card">
+            <div class="label">Game HTML Name</div>
+            <div class="gameName">branches-rights-lab.html</div>
+            <div class="small">Drop this file into your Government hub games folder.</div>
+          </div>
+
+          <div class="card" style="margin-top:14px">
+            <div class="label">Student Sign In</div>
+            <input id="studentName" class="input" type="text" placeholder="Student name" maxlength="40" />
+            <div class="chips">
+              <span class="chip">30 questions</span>
+              <span class="chip">Shuffled order</span>
+              <span class="chip">Shuffled answers</span>
+              <span class="chip">Hint on miss</span>
+              <span class="chip">Auto-advance on correct</span>
+            </div>
+            <div class="footBtns">
+              <button id="startBtn">Start Game</button>
+              <button id="resetSavedBtn" class="secondary">Reset Saved Attempt</button>
+            </div>
+          </div>
+        </div>
+
+        <div class="right">
+          <div class="card rules">
+            <h2 class="sideTitle">How it works</h2>
+            <ul>
+              <li>Read each question and scenario carefully.</li>
+              <li>If you answer correctly, the game auto-advances.</li>
+              <li>If you miss, you get a hint and must choose again.</li>
+              <li>The hint helps narrow the concept, but does <strong>not</strong> reveal the answer.</li>
+              <li>Progress, accuracy, timer, and started time stay visible during the game.</li>
+            </ul>
+          </div>
+
+          <div class="card coverage" style="margin-top:14px">
+            <h2 class="sideTitle">Content coverage</h2>
+            <ul>
+              <li><strong>CS 12:</strong> Powers and responsibilities of the three branches</li>
+              <li><strong>CS 13:</strong> Dynamic interaction and checks and balances</li>
+              <li><strong>CS 14:</strong> Rights and responsibilities</li>
+              <li><strong>CS 15:</strong> Extending civil rights to marginalized groups</li>
+              <li><strong>CS 16:</strong> Ohio Constitution compared to the U.S. Constitution</li>
+            </ul>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section id="gameScreen" class="screen">
+      <div class="panel topbar">
+        <div class="stat studentCard">
+          <div class="k">Student</div>
+          <div class="v" id="tbStudent">—</div>
+        </div>
+        <div class="stat">
+          <div class="k">Progress</div>
+          <div class="v" id="tbProgress">0 / 30</div>
+        </div>
+        <div class="stat">
+          <div class="k">Accuracy</div>
+          <div class="v" id="tbAccuracy">100%</div>
+        </div>
+        <div class="stat">
+          <div class="k">Timer</div>
+          <div class="v mono" id="tbTimer">00:00</div>
+        </div>
+        <div class="stat">
+          <div class="k">Started</div>
+          <div class="v mono mini" id="tbStarted">—</div>
+        </div>
+      </div>
+
+      <div class="grid">
+        <aside class="left panel">
+          <div class="card">
+            <div class="label">Game</div>
+            <div class="gameName">Branches & Rights Lab</div>
+            <div class="small">Big Block Thursday review for CS 12–16.</div>
+          </div>
+
+          <div class="card" style="margin-top:14px">
+            <div class="label">Progress Bar</div>
+            <div class="progressBar" aria-label="progress">
+              <div class="progressFill" id="progressFill"></div>
+            </div>
+            <div class="legend">
+              <span id="legendLeft">Question 1 of 30</span>
+              <span id="legendRight">Mastery Run</span>
+            </div>
+          </div>
+
+          <div class="card" style="margin-top:14px">
+            <div class="label">Rules</div>
+            <ul class="mini" style="margin:8px 0 0 18px;padding:0">
+              <li>One best answer per question.</li>
+              <li>On a miss, a hint appears and you choose again.</li>
+              <li>Auto-advance happens only after the correct answer.</li>
+              <li>Questions and answer choices are shuffled each new run.</li>
+              <li>Restart is available for a fresh mastery attempt.</li>
+            </ul>
+          </div>
+
+          <div class="footBtns" style="margin-top:14px">
+            <button id="restartBtn" class="warn">Restart</button>
+            <button id="backBtn" class="secondary">Back to Hub</button>
+          </div>
+        </aside>
+
+        <main class="right panel">
+          <div class="qwrap">
+            <div class="qhead">
+              <div>
+                <div class="qnum" id="qNum">Question 1</div>
+                <h2 class="question" id="qText">Loading...</h2>
+              </div>
+              <div class="qstd" id="qStandard">CS 12</div>
+            </div>
+
+            <div id="qPassage" class="passage" style="display:none"></div>
+
+            <div id="choices" class="choices"></div>
+
+            <div id="feedback" class="feedback">
+              <div class="lead" id="fbLead"></div>
+              <div id="fbExplain"></div>
+              <div class="hint" id="fbHint" style="margin-top:8px"></div>
+            </div>
+          </div>
+        </main>
+      </div>
+    </section>
+
+    <section id="resultsScreen" class="screen panel">
+      <div class="results">
+        <div class="label">Results</div>
+        <div class="scoreBig" id="finalScore">0 / 30</div>
+        <div class="muted" id="finalMessage">Nice work.</div>
+
+        <div class="resultGrid">
+          <div class="resultBox">
+            <div class="label">Student</div>
+            <div class="gameName" id="resStudent">—</div>
+          </div>
+          <div class="resultBox">
+            <div class="label">Accuracy</div>
+            <div class="gameName" id="resAccuracy">0%</div>
+          </div>
+          <div class="resultBox">
+            <div class="label">Time</div>
+            <div class="gameName mono" id="resTime">00:00</div>
+          </div>
+        </div>
+
+        <div class="card" style="margin-top:16px">
+          <div class="label">Standards hit</div>
+          <div class="chips" style="margin-top:10px">
+            <span class="chip">CS 12 Branch Powers</span>
+            <span class="chip">CS 13 Checks & Balances</span>
+            <span class="chip">CS 14 Rights & Responsibilities</span>
+            <span class="chip">CS 15 Civil Rights</span>
+            <span class="chip">CS 16 Ohio Constitution</span>
+          </div>
+        </div>
+
+        <div class="card" style="margin-top:16px">
+          <div class="label">Missed Questions Review</div>
+          <div id="missedList" class="missedList">
+            <div class="muted">Perfect run — no misses to review.</div>
+          </div>
+        </div>
+
+        <div class="footBtns">
+          <button id="playAgainBtn">Play Again</button>
+          <button id="resultsBackBtn" class="secondary">Back to Hub</button>
+        </div>
+      </div>
+    </section>
+
+  </div>
+
+  <script>
+    const TOTAL_QUESTIONS = 30;
+    const STORAGE_KEY = "gov_ost_branches_rights_lab_v1";
+    const AUTO_ADVANCE_DELAY = 700;
+
+    const QUESTION_BANK = [
+      {
+        standard:"CS 12",
+        passage:"Congress debates and passes a transportation bill that sets funding rules for highways.",
+        question:"Which branch is acting in its lawmaking role?",
+        choices:["Legislative branch","Executive branch","Judicial branch","Administrative branch"],
+        answer:"Legislative branch",
+        explanation:"The legislative branch is responsible for making laws.",
+        hint:"Think about which branch writes and passes laws."
+      },
+      {
+        standard:"CS 12",
+        passage:"After Congress passes a law, federal agencies begin carrying it out.",
+        question:"Which branch is primarily responsible for enforcing the law?",
+        choices:["Executive branch","Judicial branch","Legislative branch","State branch"],
+        answer:"Executive branch",
+        explanation:"The executive branch enforces laws.",
+        hint:"This branch carries laws into action."
+      },
+      {
+        standard:"CS 12",
+        passage:"A federal court hears an appeal involving the meaning of a law passed by Congress.",
+        question:"Which branch is performing its core constitutional role?",
+        choices:["Judicial branch","Legislative branch","Executive branch","Military branch"],
+        answer:"Judicial branch",
+        explanation:"The judicial branch interprets laws and hears cases.",
+        hint:"Which branch decides legal meaning in court?"
+      },
+      {
+        standard:"CS 12",
+        passage:"The Senate reviews and votes on a treaty negotiated by the president.",
+        question:"This example shows which branch responsibility?",
+        choices:["Legislative responsibility","Judicial responsibility","State responsibility","Local responsibility"],
+        answer:"Legislative responsibility",
+        explanation:"The Senate, part of the legislative branch, approves treaties.",
+        hint:"The Senate belongs to one of the three federal branches."
+      },
+      {
+        standard:"CS 12",
+        passage:"A president issues an executive order directing how an agency should carry out existing law.",
+        question:"Which branch is acting?",
+        choices:["Executive branch","Judicial branch","Legislative branch","County branch"],
+        answer:"Executive branch",
+        explanation:"Issuing executive orders is an executive branch power.",
+        hint:"The president leads this branch."
+      },
+      {
+        standard:"CS 12",
+        passage:"The Supreme Court reviews the meaning of a law in a disputed case.",
+        question:"Which best describes this responsibility?",
+        choices:["Interpreting law","Making law","Enforcing law","Campaigning for law"],
+        answer:"Interpreting law",
+        explanation:"The judicial branch interprets law through court cases.",
+        hint:"Courts explain what the law means."
+      },
+      {
+        standard:"CS 13",
+        passage:"Congress overrides a president’s veto with the required vote.",
+        question:"This is an example of",
+        choices:["Checks and balances","Popular sovereignty","Federalism","Reserved powers"],
+        answer:"Checks and balances",
+        explanation:"Congress can check presidential power by overriding a veto.",
+        hint:"One branch is restraining another here."
+      },
+      {
+        standard:"CS 13",
+        passage:"The president nominates a federal judge, and the Senate must approve that appointment.",
+        question:"Which idea is most clearly demonstrated?",
+        choices:["Dynamic interaction among branches","Direct democracy","State supremacy","Judicial neutrality only"],
+        answer:"Dynamic interaction among branches",
+        explanation:"The executive and legislative branches interact through appointments.",
+        hint:"This is about how branches work with and against each other."
+      },
+      {
+        standard:"CS 13",
+        passage:"The Supreme Court declares a federal law unconstitutional.",
+        question:"Which branch is being checked most directly?",
+        choices:["Legislative branch","Executive branch","State branch","Media"],
+        answer:"Legislative branch",
+        explanation:"The Court checks Congress by declaring acts unconstitutional.",
+        hint:"Which branch passed the law?"
+      },
+      {
+        standard:"CS 13",
+        passage:"Interest groups lobby lawmakers and also file briefs in court cases involving public policy.",
+        question:"What does this best show?",
+        choices:[
+          "Outside factors can affect interaction among the branches",
+          "The branches no longer matter",
+          "Checks and balances have ended",
+          "Only state governments shape policy"
+        ],
+        answer:"Outside factors can affect interaction among the branches",
+        explanation:"Interest groups are one of the factors identified in the standards as affecting branch interaction.",
+        hint:"Look for the answer involving influence on the branches from outside actors."
+      },
+      {
+        standard:"CS 13",
+        passage:"A president and congressional leaders from the same political party cooperate closely on legislation.",
+        question:"Which factor from the standards may help explain this?",
+        choices:["Political party control","District court structure","Jury selection","Ballot access only"],
+        answer:"Political party control",
+        explanation:"Party control can influence whether branches cooperate or clash.",
+        hint:"This factor relates to who controls elected offices."
+      },
+      {
+        standard:"CS 13",
+        passage:"A president grants a pardon after a conviction.",
+        question:"Which branch is being checked most directly?",
+        choices:["Judicial branch","Legislative branch","State branch","Media"],
+        answer:"Judicial branch",
+        explanation:"The pardon power checks the judicial branch by affecting the outcome of punishment.",
+        hint:"Which branch handled the conviction and sentence?"
+      },
+      {
+        standard:"CS 14",
+        passage:"A citizen publishes an editorial criticizing government policy.",
+        question:"This most directly reflects the exercise of which type of right?",
+        choices:["Political participation right","Property right only","Military right","Tax right"],
+        answer:"Political participation right",
+        explanation:"Speech and press protect participation in the political process.",
+        hint:"The right here is tied to public discussion and civic involvement."
+      },
+      {
+        standard:"CS 14",
+        passage:"A teacher reminds students that free speech includes the responsibility to discuss issues without threatening others.",
+        question:"What principle from the standards is most relevant?",
+        choices:[
+          "Rights carry responsibilities and must respect others",
+          "Rights are absolute in all settings",
+          "Rights only apply in federal court",
+          "Responsibilities replace rights"
+        ],
+        answer:"Rights carry responsibilities and must respect others",
+        explanation:"The standards emphasize that rights must be balanced with responsibilities and the rights of others.",
+        hint:"Think balance, not unlimited freedom."
+      },
+      {
+        standard:"CS 14",
+        passage:"A citizen receives a jury summons and reports for service.",
+        question:"This is an example of fulfilling a responsibility connected to",
+        choices:["The right to jury trial","The right to bear arms","Freedom of religion","Equal protection only"],
+        answer:"The right to jury trial",
+        explanation:"Serving on juries is listed as a responsibility tied to the right to jury trial.",
+        hint:"The responsibility connects to the court system."
+      },
+      {
+        standard:"CS 14",
+        passage:"A voter studies candidates and public issues before Election Day.",
+        question:"Which responsibility is being fulfilled?",
+        choices:["Being informed as part of the right to vote","Paying fees for court access","Serving in the cabinet","Joining the military"],
+        answer:"Being informed as part of the right to vote",
+        explanation:"The standards connect voting with registering and being informed on public issues.",
+        hint:"This responsibility is tied to suffrage."
+      },
+      {
+        standard:"CS 14",
+        passage:"A state law limits a liberty interest, and a citizen argues that a Bill of Rights protection applies against the state.",
+        question:"Which constitutional doctrine is most relevant?",
+        choices:["Incorporation","Federal supremacy only","Reserved powers","Nullification"],
+        answer:"Incorporation",
+        explanation:"Through the 14th Amendment, most Bill of Rights protections apply to state and local governments.",
+        hint:"This doctrine extends many federal protections to the states."
+      },
+      {
+        standard:"CS 14",
+        passage:"A person argues that his rights let him act however he wants even when it harms others.",
+        question:"Which response best matches the standards?",
+        choices:[
+          "Rights are relative and must be balanced with the rights of others and the common good",
+          "Rights have no limits once claimed",
+          "Rights only matter during elections",
+          "Rights and responsibilities are unrelated"
+        ],
+        answer:"Rights are relative and must be balanced with the rights of others and the common good",
+        explanation:"The standards explicitly say rights are relative, not absolute.",
+        hint:"Look for the answer about balancing rights."
+      },
+      {
+        standard:"CS 15",
+        passage:"Federal action was used to enforce school desegregation against resistance from state officials.",
+        question:"Which idea from CS 15 does this best illustrate?",
+        choices:[
+          "A branch of government helped extend civil rights to a marginalized group",
+          "Civil rights were fully achieved immediately after the Civil War",
+          "The Constitution denied all federal involvement",
+          "Civil rights only involve voting rules"
+        ],
+        answer:"A branch of government helped extend civil rights to a marginalized group",
+        explanation:"The executive branch sometimes acted to enforce civil rights protections.",
+        hint:"Focus on federal action expanding participation and rights."
+      },
+      {
+        standard:"CS 15",
+        passage:"Congress passes legislation barring racial discrimination in public accommodations.",
+        question:"Which branch is most directly helping extend civil rights?",
+        choices:["Legislative branch","Judicial branch","Executive branch","Local branch"],
+        answer:"Legislative branch",
+        explanation:"Passing civil rights acts is a legislative action.",
+        hint:"Which branch passes statutes?"
+      },
+      {
+        standard:"CS 15",
+        passage:"A Supreme Court ruling applies a Bill of Rights protection to the states through the 14th Amendment.",
+        question:"How does this help expand civil rights?",
+        choices:[
+          "It broadens protections and participation opportunities at the state level",
+          "It removes all rights from state citizens",
+          "It eliminates courts from civil rights issues",
+          "It prevents amendments from applying"
+        ],
+        answer:"It broadens protections and participation opportunities at the state level",
+        explanation:"Incorporation has extended many federal protections to state and local government action.",
+        hint:"The key is wider protection against state action."
+      },
+      {
+        standard:"CS 15",
+        passage:"A historian notes that constitutional guarantees did not always mean all groups could fully exercise their rights.",
+        question:"Why is this important to CS 15?",
+        choices:[
+          "Because the government increasingly responded to pressure to extend rights and participation",
+          "Because rights never changed over time",
+          "Because only courts mattered in American history",
+          "Because majority rule always protected minorities"
+        ],
+        answer:"Because the government increasingly responded to pressure to extend rights and participation",
+        explanation:"CS 15 emphasizes the historical struggle to extend civil rights and opportunities for participation.",
+        hint:"Think historical denial followed by later expansion."
+      },
+      {
+        standard:"CS 15",
+        passage:"Women gained suffrage through constitutional change.",
+        question:"Which broader theme of CS 15 does this fit best?",
+        choices:[
+          "Extending civil rights and broadening opportunities for participation",
+          "Reducing federal authority in every area",
+          "Eliminating elections",
+          "Abolishing the Bill of Rights"
+        ],
+        answer:"Extending civil rights and broadening opportunities for participation",
+        explanation:"Suffrage amendments expanded participation for previously disenfranchised groups.",
+        hint:"The key phrase is broader participation."
+      },
+      {
+        standard:"CS 16",
+        passage:"A student compares the Ohio and U.S. Constitutions and notices that both divide power among three branches.",
+        question:"This is a comparison of which shared feature?",
+        choices:["Separation of powers","Judicial elections","Initiative and referendum","Term limits only"],
+        answer:"Separation of powers",
+        explanation:"Both constitutions provide for three branches and separation of powers.",
+        hint:"This feature is shared by both constitutions."
+      },
+      {
+        standard:"CS 16",
+        passage:"In Ohio, citizens may vote directly on certain laws through initiative and referendum.",
+        question:"How does this compare with the U.S. Constitution?",
+        choices:[
+          "It is a difference because citizens do not directly vote on federal laws in the same way",
+          "It is identical to the federal process",
+          "It eliminates the legislature entirely",
+          "It applies only to federal judges"
+        ],
+        answer:"It is a difference because citizens do not directly vote on federal laws in the same way",
+        explanation:"Initiative and referendum are specifically listed as an Ohio constitutional difference.",
+        hint:"This is about direct lawmaking power by citizens."
+      },
+      {
+        standard:"CS 16",
+        passage:"A civics class learns that Ohio judges are elected while federal judges are appointed.",
+        question:"This is best described as",
+        choices:["A constitutional difference between Ohio and the U.S.","A shared constitutional similarity","A local custom only","A federal civil rights rule"],
+        answer:"A constitutional difference between Ohio and the U.S.",
+        explanation:"The standards list elected judges in Ohio and appointed judges federally as a difference.",
+        hint:"The question is asking similarity or difference."
+      },
+      {
+        standard:"CS 16",
+        passage:"A student writes that both the Ohio and U.S. Constitutions reflect popular sovereignty.",
+        question:"How should this be evaluated?",
+        choices:["Correct, because both systems are based on the people as the source of authority","Incorrect, because Ohio has no elections","Incorrect, because only the federal Constitution limits government","Correct, because both abolish legislatures"],
+        answer:"Correct, because both systems are based on the people as the source of authority",
+        explanation:"Popular sovereignty is listed as a similarity between the constitutions.",
+        hint:"Look for the shared principle based on the people."
+      },
+      {
+        standard:"CS 16",
+        passage:"A teacher explains that a new Ohio Constitution was written in 1851 to address governing difficulties.",
+        question:"Which is one example of a change made then?",
+        choices:["District courts were added","The state abolished all elections","The legislature was removed","The state ended all debt rules"],
+        answer:"District courts were added",
+        explanation:"The 1851 Ohio Constitution added district courts and made other structural changes.",
+        hint:"Find the specific reform named in the standards."
+      },
+      {
+        standard:"CS 16",
+        passage:"Ohio legislators are term-limited, but members of Congress are not.",
+        question:"This most clearly illustrates",
+        choices:["A difference between the Ohio and U.S. Constitutions","A similarity between both constitutions","A judicial responsibility","A rights doctrine"],
+        answer:"A difference between the Ohio and U.S. Constitutions",
+        explanation:"Legislative term limits in Ohio but not federally are listed as a difference.",
+        hint:"This is about a structure that exists in one system but not the other."
+      }
+    ];
+
+    const $ = sel => document.querySelector(sel);
+
+    function shuffleArray(arr){
+      const a = arr.slice();
+      for(let i=a.length-1;i>0;i--){
+        const j = Math.floor(Math.random()*(i+1));
+        [a[i],a[j]] = [a[j],a[i]];
+      }
+      return a;
+    }
+
+    function formatTime(sec){
+      const m = Math.floor(sec/60).toString().padStart(2,'0');
+      const s = Math.floor(sec%60).toString().padStart(2,'0');
+      return `${m}:${s}`;
+    }
+
+    function nowStamp(){
+      const d = new Date();
+      return d.toLocaleString([], {
+        year:'2-digit', month:'2-digit', day:'2-digit',
+        hour:'2-digit', minute:'2-digit'
+      });
+    }
+
+    function escapeHtml(str){
+      return String(str)
+        .replaceAll('&','&amp;')
+        .replaceAll('<','&lt;')
+        .replaceAll('>','&gt;')
+        .replaceAll('"','&quot;')
+        .replaceAll("'","&#39;");
+    }
+
+    function goHub(){
+      window.location.href = "../index.html";
+    }
+
+    let state = {
+      student:"",
+      startedAt:"",
+      questionSet:[],
+      index:0,
+      correct:0,
+      answered:0,
+      misses:[],
+      answeredCurrent:false,
+      attemptsOnCurrent:0,
+      timerSec:0,
+      timerId:null,
+      autoAdvanceId:null
+    };
+
+    function buildQuestionSet(){
+      return shuffleArray(QUESTION_BANK).slice(0, TOTAL_QUESTIONS).map(q => ({
+        ...q,
+        shuffledChoices: shuffleArray(q.choices)
+      }));
+    }
+
+    function saveState(){
+      const safe = {
+        ...state,
+        timerId:null,
+        autoAdvanceId:null
+      };
+      localStorage.setItem(STORAGE_KEY, JSON.stringify(safe));
+    }
+
+    function loadState(){
+      try{
+        const raw = localStorage.getItem(STORAGE_KEY);
+        if(!raw) return null;
+        return JSON.parse(raw);
+      }catch(e){
+        return null;
+      }
+    }
+
+    function clearState(){
+      localStorage.removeItem(STORAGE_KEY);
+    }
+
+    function startTimer(){
+      stopTimer();
+      state.timerId = setInterval(() => {
+        state.timerSec++;
+        $("#tbTimer").textContent = formatTime(state.timerSec);
+        saveState();
+      }, 1000);
+    }
+
+    function stopTimer(){
+      if(state.timerId) clearInterval(state.timerId);
+      state.timerId = null;
+      if(state.autoAdvanceId) clearTimeout(state.autoAdvanceId);
+      state.autoAdvanceId = null;
+    }
+
+    function showScreen(id){
+      ["startScreen","gameScreen","resultsScreen"].forEach(s => {
+        document.getElementById(s).classList.toggle("active", s===id);
+      });
+    }
+
+    function updateTopbar(){
+      $("#tbStudent").textContent = state.student || "—";
+      $("#tbProgress").textContent = `${state.answered} / ${TOTAL_QUESTIONS}`;
+      const acc = state.answered ? Math.round((state.correct / state.answered) * 100) : 100;
+      $("#tbAccuracy").textContent = `${acc}%`;
+      $("#tbTimer").textContent = formatTime(state.timerSec);
+      $("#tbStarted").textContent = state.startedAt || "—";
+      $("#progressFill").style.width = `${(state.answered / TOTAL_QUESTIONS) * 100}%`;
+      $("#legendLeft").textContent = `Question ${Math.min(state.index + 1, TOTAL_QUESTIONS)} of ${TOTAL_QUESTIONS}`;
+      $("#legendRight").textContent = acc === 100 ? "Mastery Run" : "Keep Grinding";
+    }
+
+    function renderQuestion(){
+      updateTopbar();
+
+      const q = state.questionSet[state.index];
+      if(!q){
+        finishGame();
+        return;
+      }
+
+      $("#qNum").textContent = `Question ${state.index + 1}`;
+      $("#qText").textContent = q.question;
+      $("#qStandard").textContent = q.standard;
+
+      const passageEl = $("#qPassage");
+      if(q.passage && q.passage.trim()){
+        passageEl.style.display = "block";
+        passageEl.innerHTML = escapeHtml(q.passage);
+      } else {
+        passageEl.style.display = "none";
+        passageEl.textContent = "";
+      }
+
+      const choicesEl = $("#choices");
+      choicesEl.innerHTML = "";
+      const letters = ["A","B","C","D"];
+
+      q.shuffledChoices.forEach((choice, i) => {
+        const btn = document.createElement("button");
+        btn.className = "choice";
+        btn.type = "button";
+        btn.dataset.letter = letters[i];
+        btn.innerHTML = escapeHtml(choice);
+        btn.addEventListener("click", () => handleAnswer(choice, btn));
+        choicesEl.appendChild(btn);
+      });
+
+      state.answeredCurrent = false;
+      state.attemptsOnCurrent = 0;
+
+      const fb = $("#feedback");
+      fb.className = "feedback";
+      fb.innerHTML = `<div class="lead" id="fbLead"></div><div id="fbExplain"></div><div class="hint" id="fbHint" style="margin-top:8px"></div>`;
+
+      saveState();
+    }
+
+    function showFeedback(type, lead, explain, hint){
+      const fb = $("#feedback");
+      fb.className = `feedback show ${type}`;
+      $("#fbLead").textContent = lead;
+      $("#fbExplain").innerHTML = explain || "";
+      $("#fbHint").innerHTML = hint ? `<strong>Hint:</strong> ${escapeHtml(hint)}` : "";
+    }
+
+    function disableAllChoices(){
+      [...document.querySelectorAll(".choice")].forEach(btn => btn.disabled = true);
+    }
+
+    function scheduleAutoAdvance(){
+      if(state.autoAdvanceId) clearTimeout(state.autoAdvanceId);
+      state.autoAdvanceId = setTimeout(() => {
+        nextQuestion();
+      }, AUTO_ADVANCE_DELAY);
+    }
+
+    function handleAnswer(selected, btnEl){
+      if(state.answeredCurrent) return;
+
+      const q = state.questionSet[state.index];
+      const isCorrect = selected === q.answer;
+      state.attemptsOnCurrent++;
+
+      if(isCorrect){
+        state.answeredCurrent = true;
+        state.answered++;
+        state.correct++;
+
+        disableAllChoices();
+
+        [...document.querySelectorAll(".choice")].forEach(btn => {
+          const txt = btn.textContent;
+          if(txt === q.answer) btn.classList.add("correct");
+          else btn.classList.add("dimmed");
+        });
+
+        showFeedback(
+          "good",
+          "Correct",
+          `<div>${escapeHtml(q.explanation)}</div><div style="margin-top:8px"><em>Advancing...</em></div>`,
+          ""
+        );
+
+        updateTopbar();
+        saveState();
+        scheduleAutoAdvance();
+        return;
+      }
+
+      btnEl.classList.add("incorrect");
+      btnEl.disabled = true;
+
+      if(state.attemptsOnCurrent === 1){
+        state.answered++;
+        state.misses.push({
+          standard:q.standard,
+          question:q.question,
+          selected,
+          answer:q.answer,
+          explanation:q.explanation
+        });
+      }
+
+      showFeedback(
+        "bad",
+        "Try again",
+        `<div>${escapeHtml(q.explanation)}</div><div style="margin-top:8px">Use the hint, then choose again.</div>`,
+        q.hint
+      );
+
+      updateTopbar();
+      saveState();
+    }
+
+    function nextQuestion(){
+      state.index++;
+      if(state.index >= TOTAL_QUESTIONS){
+        finishGame();
+      } else {
+        renderQuestion();
+      }
+    }
+
+    function finishGame(){
+      stopTimer();
+      clearState();
+
+      const acc = state.answered ? Math.round((state.correct / state.answered) * 100) : 0;
+      $("#finalScore").textContent = `${state.correct} / ${TOTAL_QUESTIONS}`;
+      $("#finalMessage").innerHTML =
+        acc === 100
+          ? `<span class="goodText">Perfect mastery run.</span> Outstanding work.`
+          : acc >= 85
+            ? `<span class="warnText">Strong run.</span> Review the misses and go again for mastery.`
+            : `<span class="badText">Good start.</span> Review the concepts and restart for a stronger score.`;
+
+      $("#resStudent").textContent = state.student || "—";
+      $("#resAccuracy").textContent = `${acc}%`;
+      $("#resTime").textContent = formatTime(state.timerSec);
+
+      const list = $("#missedList");
+      if(!state.misses.length){
+        list.innerHTML = `<div class="muted">Perfect run — no misses to review.</div>`;
+      } else {
+        list.innerHTML = state.misses.map((m, i) => `
+          <div class="missedItem">
+            <div class="badge">${escapeHtml(m.standard)}</div>
+            <div style="margin-top:8px;font-weight:800">${i+1}. ${escapeHtml(m.question)}</div>
+            <div class="mini muted" style="margin-top:6px"><strong>First miss:</strong> ${escapeHtml(m.selected)}</div>
+            <div class="mini" style="margin-top:4px"><strong>Correct answer:</strong> ${escapeHtml(m.answer)}</div>
+            <div class="mini muted" style="margin-top:6px">${escapeHtml(m.explanation)}</div>
+          </div>
+        `).join("");
+      }
+
+      showScreen("resultsScreen");
+    }
+
+    function startFreshGame(){
+      const student = $("#studentName").value.trim();
+
+      if(!student){
+        alert("Please enter the student name before starting.");
+        return;
+      }
+
+      state = {
+        student,
+        startedAt: nowStamp(),
+        questionSet: buildQuestionSet(),
+        index:0,
+        correct:0,
+        answered:0,
+        misses:[],
+        answeredCurrent:false,
+        attemptsOnCurrent:0,
+        timerSec:0,
+        timerId:null,
+        autoAdvanceId:null
+      };
+
+      $("#tbStarted").textContent = state.startedAt;
+      showScreen("gameScreen");
+      renderQuestion();
+      startTimer();
+      saveState();
+    }
+
+    function restoreSavedGame(saved){
+      state = {
+        ...saved,
+        timerId:null,
+        autoAdvanceId:null
+      };
+      $("#studentName").value = state.student || "";
+      showScreen("gameScreen");
+      renderQuestion();
+      startTimer();
+    }
+
+    $("#startBtn").addEventListener("click", startFreshGame);
+    $("#resetSavedBtn").addEventListener("click", () => {
+      clearState();
+      alert("Saved attempt cleared.");
+    });
+    $("#restartBtn").addEventListener("click", () => {
+      if(confirm("Restart this game with a fresh shuffled run?")){
+        stopTimer();
+        clearState();
+        showScreen("startScreen");
+      }
+    });
+    $("#backBtn").addEventListener("click", goHub);
+    $("#resultsBackBtn").addEventListener("click", goHub);
+    $("#playAgainBtn").addEventListener("click", () => {
+      stopTimer();
+      showScreen("startScreen");
+    });
+
+    (() => {
+      const saved = loadState();
+      if(saved && saved.questionSet && Array.isArray(saved.questionSet) && saved.questionSet.length){
+        const resume = confirm("Resume saved attempt for Branches & Rights Lab?");
+        if(resume){
+          restoreSavedGame(saved);
+        } else {
+          clearState();
+        }
+      }
+    })();
+  </script>
+</body>
+</html>
