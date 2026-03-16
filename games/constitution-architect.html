@@ -1,0 +1,1065 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Constitution Architect — American Government OST Review</title>
+  <link rel="stylesheet" href="../styles.css" />
+  <style>
+    :root{
+      --bg:#0b1220;
+      --panel:#111a2f;
+      --panel2:#0f1730;
+      --text:#e7eefc;
+      --muted:#a8b4cf;
+      --line:rgba(255,255,255,.12);
+      --good:#2bd576;
+      --bad:#ff5c7a;
+      --warn:#ffd166;
+      --accent:#7aa2ff;
+      --shadow:0 18px 55px rgba(0,0,0,.40);
+      --radius:18px;
+      --mono:ui-monospace,SFMono-Regular,Menlo,Monaco,Consolas,"Liberation Mono","Courier New",monospace;
+    }
+    *{box-sizing:border-box}
+    html,body{margin:0;padding:0;background:linear-gradient(180deg,var(--bg),#070b14);color:var(--text);font-family:system-ui,-apple-system,Segoe UI,Roboto,Arial,sans-serif}
+    .wrap{width:min(1180px,94vw);margin:24px auto}
+    .panel{
+      background:linear-gradient(180deg,var(--panel),var(--panel2));
+      border:1px solid var(--line);
+      border-radius:var(--radius);
+      box-shadow:var(--shadow);
+    }
+    .screen{display:none}
+    .screen.active{display:block}
+    .hero{padding:24px}
+    .title{font-size:clamp(1.5rem,2.6vw,2.35rem);font-weight:900;letter-spacing:.2px;margin:0 0 8px}
+    .subtitle{color:var(--muted);line-height:1.45;margin:0}
+    .topbar{
+      display:grid;
+      grid-template-columns:1.5fr repeat(4, minmax(110px,1fr));
+      gap:10px;
+      padding:14px;
+      margin-bottom:16px;
+      align-items:stretch;
+    }
+    .stat{
+      border:1px solid var(--line);
+      border-radius:14px;
+      background:rgba(255,255,255,.04);
+      padding:10px 12px;
+      min-height:68px;
+      display:flex;
+      flex-direction:column;
+      justify-content:center;
+    }
+    .stat .k{font-size:.78rem;color:var(--muted);margin-bottom:4px}
+    .stat .v{font-weight:800;font-size:1rem}
+    .studentCard .v{font-size:.98rem;line-height:1.2}
+    .grid{display:grid;grid-template-columns:320px 1fr;gap:16px}
+    .left,.right{padding:16px}
+    .small{font-size:.9rem;color:var(--muted)}
+    button{
+      appearance:none;border:0;cursor:pointer;
+      color:#08111f;font-weight:900;border-radius:12px;padding:12px 16px;
+      background:linear-gradient(180deg,#dfe8ff,#b8ccff);
+      box-shadow:0 10px 25px rgba(0,0,0,.25);
+    }
+    button.secondary{
+      color:var(--text);
+      background:linear-gradient(180deg,#1a2747,#13203c);
+      border:1px solid var(--line);
+      box-shadow:none;
+    }
+    button.warn{background:linear-gradient(180deg,#fff2bf,#ffd166)}
+    .card{
+      background:rgba(255,255,255,.035);
+      border:1px solid var(--line);
+      border-radius:16px;
+      padding:14px;
+    }
+    .label{font-size:.78rem;color:var(--muted);text-transform:uppercase;letter-spacing:.08em}
+    .gameName{font-size:1.2rem;font-weight:900;margin:4px 0 10px}
+    .input{
+      width:100%;margin-top:6px;
+      background:#0d162a;color:var(--text);border:1px solid var(--line);
+      border-radius:12px;padding:12px 14px;font:inherit;
+    }
+    .chips{display:flex;flex-wrap:wrap;gap:8px;margin-top:8px}
+    .chip{
+      font-size:.8rem;padding:7px 10px;border-radius:999px;
+      background:rgba(122,162,255,.12);border:1px solid rgba(122,162,255,.28);color:#dfe8ff;
+    }
+    .qwrap{padding:18px}
+    .qhead{display:flex;justify-content:space-between;gap:12px;align-items:flex-start;margin-bottom:10px}
+    .qnum{font-size:.85rem;color:var(--muted);font-weight:800;letter-spacing:.06em;text-transform:uppercase}
+    .qstd{font-size:.8rem;color:#cfe0ff;background:rgba(122,162,255,.13);border:1px solid rgba(122,162,255,.25);padding:6px 10px;border-radius:999px;white-space:nowrap}
+    .passage{
+      margin:10px 0 14px;
+      background:rgba(255,255,255,.03);
+      border-left:4px solid rgba(122,162,255,.7);
+      border-radius:12px;
+      padding:14px 14px 14px 16px;
+      line-height:1.55;
+      color:#deebff;
+    }
+    .question{font-size:1.08rem;line-height:1.45;font-weight:750;margin:0 0 14px}
+    .choices{display:grid;gap:10px}
+    .choice{
+      width:100%;text-align:left;border:1px solid var(--line);
+      background:rgba(255,255,255,.04);color:var(--text);border-radius:14px;
+      padding:14px 14px 14px 48px;position:relative;font-weight:700;
+      box-shadow:none;
+      transition:background .15s ease, border-color .15s ease, transform .08s ease;
+    }
+    .choice::before{
+      content:attr(data-letter);
+      position:absolute;left:14px;top:50%;transform:translateY(-50%);
+      width:22px;height:22px;border-radius:50%;
+      background:rgba(255,255,255,.08);border:1px solid var(--line);
+      display:grid;place-items:center;color:#dce7ff;font-size:.82rem;font-weight:900;
+    }
+    .choice:hover{background:rgba(255,255,255,.07)}
+    .choice:active{transform:translateY(1px)}
+    .choice.correct{border-color:rgba(43,213,118,.45);background:rgba(43,213,118,.12)}
+    .choice.incorrect{border-color:rgba(255,92,122,.45);background:rgba(255,92,122,.12)}
+    .choice.dimmed{opacity:.5}
+    .feedback{
+      margin-top:14px;border-radius:14px;padding:14px;border:1px solid var(--line);
+      background:rgba(255,255,255,.04);display:none
+    }
+    .feedback.show{display:block}
+    .feedback.good{border-color:rgba(43,213,118,.35);background:rgba(43,213,118,.10)}
+    .feedback.bad{border-color:rgba(255,209,102,.35);background:rgba(255,209,102,.10)}
+    .feedback .lead{font-weight:900;margin-bottom:6px}
+    .feedback .hint{color:#fff3c7}
+    .sideTitle{font-size:1rem;font-weight:900;margin:0 0 8px}
+    .rules ul,.coverage ul{margin:8px 0 0 18px;padding:0}
+    .rules li,.coverage li{margin:6px 0;line-height:1.4}
+    .progressBar{
+      width:100%;height:12px;border-radius:999px;background:rgba(255,255,255,.07);
+      border:1px solid var(--line);overflow:hidden
+    }
+    .progressFill{
+      height:100%;width:0%;
+      background:linear-gradient(90deg,#79a6ff,#2bd576);
+      transition:width .25s ease;
+    }
+    .legend{
+      display:flex;justify-content:space-between;gap:12px;color:var(--muted);
+      font-size:.9rem;margin-top:8px
+    }
+    .footBtns{display:flex;gap:10px;flex-wrap:wrap;margin-top:14px}
+    .results{padding:24px}
+    .scoreBig{font-size:clamp(2rem,5vw,3rem);font-weight:1000;line-height:1;margin:4px 0 8px}
+    .resultGrid{display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin-top:16px}
+    .resultBox{
+      border:1px solid var(--line);border-radius:16px;padding:14px;background:rgba(255,255,255,.04)
+    }
+    .missedList{display:grid;gap:10px;margin-top:16px}
+    .missedItem{
+      border:1px solid var(--line);border-radius:14px;padding:12px;background:rgba(255,255,255,.035)
+    }
+    .muted{color:var(--muted)}
+    .mini{font-size:.86rem}
+    .mono{font-family:var(--mono)}
+    .badge{
+      display:inline-block;padding:6px 10px;border-radius:999px;
+      border:1px solid var(--line);background:rgba(255,255,255,.05);font-size:.8rem;font-weight:800
+    }
+    .goodText{color:#93f0b7}
+    .warnText{color:#ffe28b}
+    .badText{color:#ffafc0}
+    @media (max-width: 980px){
+      .topbar{grid-template-columns:1fr 1fr}
+      .grid{grid-template-columns:1fr}
+      .resultGrid{grid-template-columns:1fr 1fr}
+    }
+    @media (max-width: 640px){
+      .wrap{width:min(96vw,96vw);margin:12px auto}
+      .topbar{grid-template-columns:1fr}
+      .resultGrid{grid-template-columns:1fr}
+      .qhead{flex-direction:column;align-items:flex-start}
+      .left,.right,.qwrap,.hero,.results{padding:14px}
+    }
+  </style>
+</head>
+<body>
+  <div class="wrap">
+
+    <section id="startScreen" class="screen active panel">
+      <div class="hero">
+        <div class="label">American Government OST Review</div>
+        <h1 class="title">Constitution Architect</h1>
+        <p class="subtitle">
+          Wednesday Big Block Review • Content Statements 5–7<br>
+          Basic constitutional principles, Federalists and Anti-Federalists, and changes in constitutional government over time.
+        </p>
+      </div>
+
+      <div class="grid">
+        <div class="left">
+          <div class="card">
+            <div class="label">Game HTML Name</div>
+            <div class="gameName">constitution-architect.html</div>
+            <div class="small">Drop this file into your Government hub games folder.</div>
+          </div>
+
+          <div class="card" style="margin-top:14px">
+            <div class="label">Student Sign In</div>
+            <input id="studentName" class="input" type="text" placeholder="Student name" maxlength="40" />
+            <div class="chips">
+              <span class="chip">30 questions</span>
+              <span class="chip">Shuffled order</span>
+              <span class="chip">Shuffled answers</span>
+              <span class="chip">Hint on miss</span>
+              <span class="chip">Auto-advance on correct</span>
+            </div>
+            <div class="footBtns">
+              <button id="startBtn">Start Game</button>
+              <button id="resetSavedBtn" class="secondary">Reset Saved Attempt</button>
+            </div>
+          </div>
+        </div>
+
+        <div class="right">
+          <div class="card rules">
+            <h2 class="sideTitle">How it works</h2>
+            <ul>
+              <li>Read each question and scenario carefully.</li>
+              <li>If you answer correctly, the game auto-advances.</li>
+              <li>If you miss, you get a hint and must choose again.</li>
+              <li>The hint helps narrow the concept, but does <strong>not</strong> reveal the answer.</li>
+              <li>Progress, accuracy, timer, and started time stay visible during the game.</li>
+            </ul>
+          </div>
+
+          <div class="card coverage" style="margin-top:14px">
+            <h2 class="sideTitle">Content coverage</h2>
+            <ul>
+              <li><strong>CS 5:</strong> Popular sovereignty, limited government, federalism, separation of powers, checks and balances</li>
+              <li><strong>CS 6:</strong> Federalists, Anti-Federalists, ratification, Bill of Rights debate</li>
+              <li><strong>CS 7:</strong> Amendments, judicial review, legislation, and informal practices</li>
+            </ul>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section id="gameScreen" class="screen">
+      <div class="panel topbar">
+        <div class="stat studentCard">
+          <div class="k">Student</div>
+          <div class="v" id="tbStudent">—</div>
+        </div>
+        <div class="stat">
+          <div class="k">Progress</div>
+          <div class="v" id="tbProgress">0 / 30</div>
+        </div>
+        <div class="stat">
+          <div class="k">Accuracy</div>
+          <div class="v" id="tbAccuracy">100%</div>
+        </div>
+        <div class="stat">
+          <div class="k">Timer</div>
+          <div class="v mono" id="tbTimer">00:00</div>
+        </div>
+        <div class="stat">
+          <div class="k">Started</div>
+          <div class="v mono mini" id="tbStarted">—</div>
+        </div>
+      </div>
+
+      <div class="grid">
+        <aside class="left panel">
+          <div class="card">
+            <div class="label">Game</div>
+            <div class="gameName">Constitution Architect</div>
+            <div class="small">Big Block Wednesday review for CS 5–7.</div>
+          </div>
+
+          <div class="card" style="margin-top:14px">
+            <div class="label">Progress Bar</div>
+            <div class="progressBar" aria-label="progress">
+              <div class="progressFill" id="progressFill"></div>
+            </div>
+            <div class="legend">
+              <span id="legendLeft">Question 1 of 30</span>
+              <span id="legendRight">Mastery Run</span>
+            </div>
+          </div>
+
+          <div class="card" style="margin-top:14px">
+            <div class="label">Rules</div>
+            <ul class="mini" style="margin:8px 0 0 18px;padding:0">
+              <li>One best answer per question.</li>
+              <li>On a miss, a hint appears and you choose again.</li>
+              <li>Auto-advance happens only after the correct answer.</li>
+              <li>Questions and answer choices are shuffled each new run.</li>
+              <li>Restart is available for a fresh mastery attempt.</li>
+            </ul>
+          </div>
+
+          <div class="footBtns" style="margin-top:14px">
+            <button id="restartBtn" class="warn">Restart</button>
+            <button id="backBtn" class="secondary">Back to Hub</button>
+          </div>
+        </aside>
+
+        <main class="right panel">
+          <div class="qwrap">
+            <div class="qhead">
+              <div>
+                <div class="qnum" id="qNum">Question 1</div>
+                <h2 class="question" id="qText">Loading...</h2>
+              </div>
+              <div class="qstd" id="qStandard">CS 5</div>
+            </div>
+
+            <div id="qPassage" class="passage" style="display:none"></div>
+
+            <div id="choices" class="choices"></div>
+
+            <div id="feedback" class="feedback">
+              <div class="lead" id="fbLead"></div>
+              <div id="fbExplain"></div>
+              <div class="hint" id="fbHint" style="margin-top:8px"></div>
+            </div>
+          </div>
+        </main>
+      </div>
+    </section>
+
+    <section id="resultsScreen" class="screen panel">
+      <div class="results">
+        <div class="label">Results</div>
+        <div class="scoreBig" id="finalScore">0 / 30</div>
+        <div class="muted" id="finalMessage">Nice work.</div>
+
+        <div class="resultGrid">
+          <div class="resultBox">
+            <div class="label">Student</div>
+            <div class="gameName" id="resStudent">—</div>
+          </div>
+          <div class="resultBox">
+            <div class="label">Accuracy</div>
+            <div class="gameName" id="resAccuracy">0%</div>
+          </div>
+          <div class="resultBox">
+            <div class="label">Time</div>
+            <div class="gameName mono" id="resTime">00:00</div>
+          </div>
+        </div>
+
+        <div class="card" style="margin-top:16px">
+          <div class="label">Standards hit</div>
+          <div class="chips" style="margin-top:10px">
+            <span class="chip">CS 5 Constitutional Principles</span>
+            <span class="chip">CS 6 Federalists / Anti-Federalists</span>
+            <span class="chip">CS 7 Constitutional Change</span>
+          </div>
+        </div>
+
+        <div class="card" style="margin-top:16px">
+          <div class="label">Missed Questions Review</div>
+          <div id="missedList" class="missedList">
+            <div class="muted">Perfect run — no misses to review.</div>
+          </div>
+        </div>
+
+        <div class="footBtns">
+          <button id="playAgainBtn">Play Again</button>
+          <button id="resultsBackBtn" class="secondary">Back to Hub</button>
+        </div>
+      </div>
+    </section>
+
+  </div>
+
+  <script>
+    const TOTAL_QUESTIONS = 30;
+    const STORAGE_KEY = "gov_ost_constitution_architect_v1";
+    const AUTO_ADVANCE_DELAY = 700;
+
+    const QUESTION_BANK = [
+      {
+        standard:"CS 5",
+        passage:"A civics teacher says that the U.S. government gets its authority from the people, not from a king or inherited power.",
+        question:"Which constitutional principle is being described?",
+        choices:["Popular sovereignty","Federalism","Judicial review","Reserved powers"],
+        answer:"Popular sovereignty",
+        explanation:"Popular sovereignty means the people are the source of governmental authority.",
+        hint:"Think about the principle based on consent of the governed."
+      },
+      {
+        standard:"CS 5",
+        passage:"A city official argues that local government cannot simply create powers for itself unless those powers are granted under law.",
+        question:"Which principle best matches this idea?",
+        choices:["Limited government","Checks and balances","Electoral college","Strict scrutiny"],
+        answer:"Limited government",
+        explanation:"Limited government means government can only exercise powers that are granted to it.",
+        hint:"Focus on the idea that government power has boundaries."
+      },
+      {
+        standard:"CS 5",
+        passage:"The national government handles foreign affairs while state governments regulate many local matters.",
+        question:"Which principle does this best illustrate?",
+        choices:["Federalism","Popular sovereignty","Impeachment","Judicial review"],
+        answer:"Federalism",
+        explanation:"Federalism divides power between national and state governments.",
+        hint:"Look for the principle involving shared power between levels of government."
+      },
+      {
+        standard:"CS 5",
+        passage:"Congress writes laws, the president enforces them, and the courts interpret them.",
+        question:"This structure is the best example of",
+        choices:["Separation of powers","Reserved powers","Popular sovereignty","Direct democracy"],
+        answer:"Separation of powers",
+        explanation:"Separation of powers distributes authority among independent branches.",
+        hint:"Which principle divides authority among branches?"
+      },
+      {
+        standard:"CS 5",
+        passage:"Congress can override a presidential veto, and courts can rule actions unconstitutional.",
+        question:"Which principle is most clearly shown here?",
+        choices:["Checks and balances","Federalism","Popular sovereignty","Term limits"],
+        answer:"Checks and balances",
+        explanation:"Checks and balances allow branches to restrain one another.",
+        hint:"This principle is about one branch limiting another."
+      },
+      {
+        standard:"CS 5",
+        passage:"A student says the Constitution defines the United States as a federal republic.",
+        question:"Which principle best supports the word 'federal' in that statement?",
+        choices:["Federalism","Due process","Incorporation","Judicial restraint"],
+        answer:"Federalism",
+        explanation:"Federalism is the division of powers between national and state governments.",
+        hint:"Think national and state power together."
+      },
+      {
+        standard:"CS 5",
+        passage:"A president cannot legally ignore a Supreme Court ruling simply because he disagrees with it.",
+        question:"Which constitutional principle is most closely tied to this idea?",
+        choices:["Limited government","Direct democracy","Reserved powers","Electoral majority"],
+        answer:"Limited government",
+        explanation:"Government officials are constrained by law and constitutional structure.",
+        hint:"The key idea is that officials are not above the law."
+      },
+      {
+        standard:"CS 5",
+        passage:"The Framers wanted to prevent any one part of government from becoming too powerful.",
+        question:"Which pair of principles best addresses that goal?",
+        choices:[
+          "Separation of powers and checks and balances",
+          "Popular sovereignty and federalism",
+          "Judicial review and direct democracy",
+          "Federalism and electoral voting"
+        ],
+        answer:"Separation of powers and checks and balances",
+        explanation:"Power is divided among branches and each branch can check the others.",
+        hint:"One principle divides power; the other restrains power."
+      },
+      {
+        standard:"CS 5",
+        passage:"People vote for representatives, and those representatives govern under constitutional limits.",
+        question:"Which principle is most directly reflected in the idea that government rules with public consent?",
+        choices:["Popular sovereignty","Judicial review","Reserved powers","Ratification"],
+        answer:"Popular sovereignty",
+        explanation:"Popular sovereignty means government derives authority from the people.",
+        hint:"Consent of the governed is the core phrase."
+      },
+      {
+        standard:"CS 5",
+        passage:"State governments control many education matters, while the national government regulates immigration and foreign policy.",
+        question:"This is the clearest example of",
+        choices:["Federalism","Separation of church and state","Incorporation","Legislative oversight"],
+        answer:"Federalism",
+        explanation:"Federalism divides authority among levels of government.",
+        hint:"Think about the relationship between state and national governments."
+      },
+      {
+        standard:"CS 6",
+        passage:"A writer in 1788 supports ratification because the Articles of Confederation left the national government too weak to solve major problems.",
+        question:"This writer would most likely be a",
+        choices:["Federalist","Anti-Federalist","state judge","loyalist"],
+        answer:"Federalist",
+        explanation:"Federalists supported ratification and wanted a stronger national government.",
+        hint:"Which side favored the Constitution because the Articles were too weak?"
+      },
+      {
+        standard:"CS 6",
+        passage:"An opponent of ratification warns that the new Constitution lacks protections for individual liberties.",
+        question:"This concern most closely matches the views of",
+        choices:["Anti-Federalists","Federalists","the Supreme Court","state legislatures only"],
+        answer:"Anti-Federalists",
+        explanation:"Anti-Federalists worried the national government would become too strong without a bill of rights.",
+        hint:"This side feared centralized power and wanted clearer protections."
+      },
+      {
+        standard:"CS 6",
+        passage:"A speaker argues that the supremacy clause is necessary to make the national government effective.",
+        question:"Which side would be more likely to agree?",
+        choices:["Federalists","Anti-Federalists","local juries","county executives"],
+        answer:"Federalists",
+        explanation:"Federalists supported stronger national authority, including the supremacy clause.",
+        hint:"Which side trusted the new Constitution more?"
+      },
+      {
+        standard:"CS 6",
+        passage:"A pamphlet claims the necessary and proper clause could let Congress stretch its power too far.",
+        question:"This is most likely an example of which viewpoint?",
+        choices:["Anti-Federalist","Federalist","executive","judicial"],
+        answer:"Anti-Federalist",
+        explanation:"Anti-Federalists feared broad clauses would expand national power too much.",
+        hint:"Think skepticism toward implied national power."
+      },
+      {
+        standard:"CS 6",
+        passage:"A student reads two excerpts. One supports ratification and a stronger national government. The other warns about the danger of centralized power.",
+        question:"These excerpts most likely represent the debate between",
+        choices:[
+          "Federalists and Anti-Federalists",
+          "Whigs and Democrats",
+          "the House and Senate",
+          "state and local officials"
+        ],
+        answer:"Federalists and Anti-Federalists",
+        explanation:"Those two groups framed the ratification debate over the Constitution.",
+        hint:"This was the major constitutional debate at ratification."
+      },
+      {
+        standard:"CS 6",
+        passage:"One side argued that the Constitution should be approved. The other argued that liberties needed clearer protection from the national government.",
+        question:"What was the major result of this debate?",
+        choices:[
+          "The Constitution was ratified and the Bill of Rights was added",
+          "The Constitution was rejected and the Articles were kept permanently",
+          "The presidency was eliminated",
+          "The states lost all governing power"
+        ],
+        answer:"The Constitution was ratified and the Bill of Rights was added",
+        explanation:"Federalists won ratification, but Anti-Federalist pressure helped secure the Bill of Rights.",
+        hint:"Look for the answer that combines ratification with later protections."
+      },
+      {
+        standard:"CS 6",
+        passage:"A ratification supporter argues that the United States needs national power to tax and govern effectively.",
+        question:"Which weakness of the Articles of Confederation is this person highlighting?",
+        choices:[
+          "The national government lacked enough practical power",
+          "The presidency was too strong",
+          "The judiciary controlled the states",
+          "State governments were completely abolished"
+        ],
+        answer:"The national government lacked enough practical power",
+        explanation:"Federalists often criticized the Articles for leaving the national government too weak to act effectively.",
+        hint:"The clue is ineffective national power under the Articles."
+      },
+      {
+        standard:"CS 6",
+        passage:"A speaker says state governments should remain more powerful than the national government.",
+        question:"Which side of the ratification debate would most likely agree?",
+        choices:["Anti-Federalists","Federalists","national judges","cabinet members"],
+        answer:"Anti-Federalists",
+        explanation:"Anti-Federalists favored stronger state governments and were wary of centralized national authority.",
+        hint:"Which side trusted state governments more?"
+      },
+      {
+        standard:"CS 6",
+        passage:"A Federalist and an Anti-Federalist disagree over whether a bill of rights is necessary.",
+        question:"Why did Anti-Federalists think it was needed?",
+        choices:[
+          "To protect citizens from possible abuse by the national government",
+          "To weaken every state government immediately",
+          "To remove the need for courts",
+          "To prevent elections from taking place"
+        ],
+        answer:"To protect citizens from possible abuse by the national government",
+        explanation:"Anti-Federalists wanted explicit protections for individual liberties.",
+        hint:"The key issue was protection from government power."
+      },
+      {
+        standard:"CS 6",
+        passage:"A writer defends the Constitution by arguing that the national government must be supreme in some areas to solve national problems.",
+        question:"This position is most consistent with",
+        choices:["Federalist thought","Anti-Federalist thought","localist thought","judicial neutrality only"],
+        answer:"Federalist thought",
+        explanation:"Federalists argued that the national government needed greater authority than under the Articles.",
+        hint:"Which side believed stronger national power was necessary?"
+      },
+      {
+        standard:"CS 7",
+        passage:"The states ratify an amendment changing presidential succession procedures.",
+        question:"This is an example of constitutional change through",
+        choices:["formal amendment","judicial interpretation","executive enforcement","informal custom only"],
+        answer:"formal amendment",
+        explanation:"Amendments are the formal constitutional method of change.",
+        hint:"This is the official written change process."
+      },
+      {
+        standard:"CS 7",
+        passage:"The Supreme Court interprets a constitutional clause in a way that affects how government acts today.",
+        question:"This best shows constitutional change through",
+        choices:["judicial decision","state referendum","executive order only","party platform"],
+        answer:"judicial decision",
+        explanation:"Supreme Court decisions can clarify, extend, and shape constitutional meaning.",
+        hint:"Which branch interprets the Constitution in cases?"
+      },
+      {
+        standard:"CS 7",
+        passage:"Congress passes a civil rights law that gives more detailed direction for applying constitutional principles.",
+        question:"This is the best example of change through",
+        choices:["legislation","ratification convention","impeachment","electoral custom"],
+        answer:"legislation",
+        explanation:"Congress can build on the constitutional framework by passing laws.",
+        hint:"Which branch adds detail through statutes?"
+      },
+      {
+        standard:"CS 7",
+        passage:"Congress regularly investigates executive agencies to gather information and monitor enforcement.",
+        question:"This practice is best described as",
+        choices:["legislative oversight","popular sovereignty","reserved powers","double jeopardy"],
+        answer:"legislative oversight",
+        explanation:"Legislative oversight is an informal practice that developed as part of how government functions.",
+        hint:"This is the informal practice specifically named in the standards."
+      },
+      {
+        standard:"CS 7",
+        passage:"A student says the Constitution's basic principles never change in meaning because the words stay the same.",
+        question:"Which response best corrects that statement?",
+        choices:[
+          "Their meaning and application can change through amendments, court rulings, laws, and informal practices",
+          "Only presidents can change constitutional meaning",
+          "State governments may ignore the Constitution if needed",
+          "The Constitution is rewritten every decade"
+        ],
+        answer:"Their meaning and application can change through amendments, court rulings, laws, and informal practices",
+        explanation:"CS 7 emphasizes that constitutional government changes in multiple ways over time.",
+        hint:"Think broader than just the written words."
+      },
+      {
+        standard:"CS 7",
+        passage:"A Court ruling declares an act of government unconstitutional.",
+        question:"Which constitutional power is being exercised?",
+        choices:["Judicial review","Ratification","Reserved powers","Legislative oversight"],
+        answer:"Judicial review",
+        explanation:"Judicial review allows courts to declare laws or government actions unconstitutional.",
+        hint:"This power belongs to the courts."
+      },
+      {
+        standard:"CS 7",
+        passage:"A new constitutional amendment voids or replaces an earlier constitutional provision.",
+        question:"This example shows that amendments can",
+        choices:[
+          "add to, modify, replace, or void earlier constitutional provisions",
+          "only create state laws",
+          "only affect elections",
+          "replace the entire judiciary"
+        ],
+        answer:"add to, modify, replace, or void earlier constitutional provisions",
+        explanation:"The standards explicitly note that amendments can change previous constitutional text in multiple ways.",
+        hint:"Amendments do more than just add new text."
+      },
+      {
+        standard:"CS 7",
+        passage:"Congress wants information from executive agencies so it can decide whether new laws are needed.",
+        question:"Why is this an important example of constitutional change?",
+        choices:[
+          "It shows how informal practices shape how constitutional government works in reality",
+          "It proves the Constitution is no longer relevant",
+          "It eliminates separation of powers",
+          "It transfers executive power to the states"
+        ],
+        answer:"It shows how informal practices shape how constitutional government works in reality",
+        explanation:"Informal practices can change how constitutional government is implemented over time.",
+        hint:"This question is about real-world government practice beyond exact text."
+      },
+      {
+        standard:"CS 7",
+        passage:"A Supreme Court decision clarifies a constitutional provision in a way that affects civil rights protections.",
+        question:"This most clearly shows that the Court can",
+        choices:[
+          "extend and clarify constitutional meaning",
+          "ratify amendments by itself",
+          "rewrite the Constitution without cases",
+          "control state elections directly"
+        ],
+        answer:"extend and clarify constitutional meaning",
+        explanation:"Court decisions can clarify and extend the meaning of constitutional provisions.",
+        hint:"Focus on interpretation and application."
+      },
+      {
+        standard:"CS 7",
+        passage:"A teacher asks for the best summary of how constitutional government changes over time.",
+        question:"Which answer is best?",
+        choices:[
+          "Through amendments, Supreme Court decisions, legislation, and informal practices",
+          "Only through amendments and elections",
+          "Only through judicial review",
+          "Only through state constitutions"
+        ],
+        answer:"Through amendments, Supreme Court decisions, legislation, and informal practices",
+        explanation:"That is the full framework given in CS 7.",
+        hint:"The right answer includes all four mechanisms."
+      }
+    ];
+
+    const $ = sel => document.querySelector(sel);
+
+    function shuffleArray(arr){
+      const a = arr.slice();
+      for(let i=a.length-1;i>0;i--){
+        const j = Math.floor(Math.random()*(i+1));
+        [a[i],a[j]] = [a[j],a[i]];
+      }
+      return a;
+    }
+
+    function formatTime(sec){
+      const m = Math.floor(sec/60).toString().padStart(2,'0');
+      const s = Math.floor(sec%60).toString().padStart(2,'0');
+      return `${m}:${s}`;
+    }
+
+    function nowStamp(){
+      const d = new Date();
+      return d.toLocaleString([], {
+        year:'2-digit', month:'2-digit', day:'2-digit',
+        hour:'2-digit', minute:'2-digit'
+      });
+    }
+
+    function escapeHtml(str){
+      return String(str)
+        .replaceAll('&','&amp;')
+        .replaceAll('<','&lt;')
+        .replaceAll('>','&gt;')
+        .replaceAll('"','&quot;')
+        .replaceAll("'","&#39;");
+    }
+
+    function goHub(){
+      window.location.href = "../index.html";
+    }
+
+    let state = {
+      student:"",
+      startedAt:"",
+      questionSet:[],
+      index:0,
+      correct:0,
+      answered:0,
+      misses:[],
+      answeredCurrent:false,
+      attemptsOnCurrent:0,
+      timerSec:0,
+      timerId:null,
+      autoAdvanceId:null
+    };
+
+    function buildQuestionSet(){
+      return shuffleArray(QUESTION_BANK).slice(0, TOTAL_QUESTIONS).map(q => ({
+        ...q,
+        shuffledChoices: shuffleArray(q.choices)
+      }));
+    }
+
+    function saveState(){
+      const safe = {
+        ...state,
+        timerId:null,
+        autoAdvanceId:null
+      };
+      localStorage.setItem(STORAGE_KEY, JSON.stringify(safe));
+    }
+
+    function loadState(){
+      try{
+        const raw = localStorage.getItem(STORAGE_KEY);
+        if(!raw) return null;
+        return JSON.parse(raw);
+      }catch(e){
+        return null;
+      }
+    }
+
+    function clearState(){
+      localStorage.removeItem(STORAGE_KEY);
+    }
+
+    function startTimer(){
+      stopTimer();
+      state.timerId = setInterval(() => {
+        state.timerSec++;
+        $("#tbTimer").textContent = formatTime(state.timerSec);
+        saveState();
+      }, 1000);
+    }
+
+    function stopTimer(){
+      if(state.timerId) clearInterval(state.timerId);
+      state.timerId = null;
+      if(state.autoAdvanceId) clearTimeout(state.autoAdvanceId);
+      state.autoAdvanceId = null;
+    }
+
+    function showScreen(id){
+      ["startScreen","gameScreen","resultsScreen"].forEach(s => {
+        document.getElementById(s).classList.toggle("active", s===id);
+      });
+    }
+
+    function updateTopbar(){
+      $("#tbStudent").textContent = state.student || "—";
+      $("#tbProgress").textContent = `${state.answered} / ${TOTAL_QUESTIONS}`;
+      const acc = state.answered ? Math.round((state.correct / state.answered) * 100) : 100;
+      $("#tbAccuracy").textContent = `${acc}%`;
+      $("#tbTimer").textContent = formatTime(state.timerSec);
+      $("#tbStarted").textContent = state.startedAt || "—";
+      $("#progressFill").style.width = `${(state.answered / TOTAL_QUESTIONS) * 100}%`;
+      $("#legendLeft").textContent = `Question ${Math.min(state.index + 1, TOTAL_QUESTIONS)} of ${TOTAL_QUESTIONS}`;
+      $("#legendRight").textContent = acc === 100 ? "Mastery Run" : "Keep Grinding";
+    }
+
+    function renderQuestion(){
+      updateTopbar();
+
+      const q = state.questionSet[state.index];
+      if(!q){
+        finishGame();
+        return;
+      }
+
+      $("#qNum").textContent = `Question ${state.index + 1}`;
+      $("#qText").textContent = q.question;
+      $("#qStandard").textContent = q.standard;
+
+      const passageEl = $("#qPassage");
+      if(q.passage && q.passage.trim()){
+        passageEl.style.display = "block";
+        passageEl.innerHTML = escapeHtml(q.passage);
+      } else {
+        passageEl.style.display = "none";
+        passageEl.textContent = "";
+      }
+
+      const choicesEl = $("#choices");
+      choicesEl.innerHTML = "";
+      const letters = ["A","B","C","D"];
+
+      q.shuffledChoices.forEach((choice, i) => {
+        const btn = document.createElement("button");
+        btn.className = "choice";
+        btn.type = "button";
+        btn.dataset.letter = letters[i];
+        btn.innerHTML = escapeHtml(choice);
+        btn.addEventListener("click", () => handleAnswer(choice, btn));
+        choicesEl.appendChild(btn);
+      });
+
+      state.answeredCurrent = false;
+      state.attemptsOnCurrent = 0;
+
+      const fb = $("#feedback");
+      fb.className = "feedback";
+      fb.innerHTML = `<div class="lead" id="fbLead"></div><div id="fbExplain"></div><div class="hint" id="fbHint" style="margin-top:8px"></div>`;
+
+      saveState();
+    }
+
+    function showFeedback(type, lead, explain, hint){
+      const fb = $("#feedback");
+      fb.className = `feedback show ${type}`;
+      $("#fbLead").textContent = lead;
+      $("#fbExplain").innerHTML = explain || "";
+      $("#fbHint").innerHTML = hint ? `<strong>Hint:</strong> ${escapeHtml(hint)}` : "";
+    }
+
+    function disableAllChoices(){
+      [...document.querySelectorAll(".choice")].forEach(btn => btn.disabled = true);
+    }
+
+    function scheduleAutoAdvance(){
+      if(state.autoAdvanceId) clearTimeout(state.autoAdvanceId);
+      state.autoAdvanceId = setTimeout(() => {
+        nextQuestion();
+      }, AUTO_ADVANCE_DELAY);
+    }
+
+    function handleAnswer(selected, btnEl){
+      if(state.answeredCurrent) return;
+
+      const q = state.questionSet[state.index];
+      const isCorrect = selected === q.answer;
+      state.attemptsOnCurrent++;
+
+      if(isCorrect){
+        state.answeredCurrent = true;
+        state.answered++;
+        state.correct++;
+
+        disableAllChoices();
+
+        [...document.querySelectorAll(".choice")].forEach(btn => {
+          const txt = btn.textContent;
+          if(txt === q.answer) btn.classList.add("correct");
+          else btn.classList.add("dimmed");
+        });
+
+        showFeedback(
+          "good",
+          "Correct",
+          `<div>${escapeHtml(q.explanation)}</div><div style="margin-top:8px"><em>Advancing...</em></div>`,
+          ""
+        );
+
+        updateTopbar();
+        saveState();
+        scheduleAutoAdvance();
+        return;
+      }
+
+      btnEl.classList.add("incorrect");
+      btnEl.disabled = true;
+
+      if(state.attemptsOnCurrent === 1){
+        state.answered++;
+        state.misses.push({
+          standard:q.standard,
+          question:q.question,
+          selected,
+          answer:q.answer,
+          explanation:q.explanation
+        });
+      }
+
+      showFeedback(
+        "bad",
+        "Try again",
+        `<div>${escapeHtml(q.explanation)}</div><div style="margin-top:8px">Use the hint, then choose again.</div>`,
+        q.hint
+      );
+
+      updateTopbar();
+      saveState();
+    }
+
+    function nextQuestion(){
+      state.index++;
+      if(state.index >= TOTAL_QUESTIONS){
+        finishGame();
+      } else {
+        renderQuestion();
+      }
+    }
+
+    function finishGame(){
+      stopTimer();
+      clearState();
+
+      const acc = state.answered ? Math.round((state.correct / state.answered) * 100) : 0;
+      $("#finalScore").textContent = `${state.correct} / ${TOTAL_QUESTIONS}`;
+      $("#finalMessage").innerHTML =
+        acc === 100
+          ? `<span class="goodText">Perfect mastery run.</span> Outstanding work.`
+          : acc >= 85
+            ? `<span class="warnText">Strong run.</span> Review the misses and go again for mastery.`
+            : `<span class="badText">Good start.</span> Review the concepts and restart for a stronger score.`;
+
+      $("#resStudent").textContent = state.student || "—";
+      $("#resAccuracy").textContent = `${acc}%`;
+      $("#resTime").textContent = formatTime(state.timerSec);
+
+      const list = $("#missedList");
+      if(!state.misses.length){
+        list.innerHTML = `<div class="muted">Perfect run — no misses to review.</div>`;
+      } else {
+        list.innerHTML = state.misses.map((m, i) => `
+          <div class="missedItem">
+            <div class="badge">${escapeHtml(m.standard)}</div>
+            <div style="margin-top:8px;font-weight:800">${i+1}. ${escapeHtml(m.question)}</div>
+            <div class="mini muted" style="margin-top:6px"><strong>First miss:</strong> ${escapeHtml(m.selected)}</div>
+            <div class="mini" style="margin-top:4px"><strong>Correct answer:</strong> ${escapeHtml(m.answer)}</div>
+            <div class="mini muted" style="margin-top:6px">${escapeHtml(m.explanation)}</div>
+          </div>
+        `).join("");
+      }
+
+      showScreen("resultsScreen");
+    }
+
+    function startFreshGame(){
+      const student = $("#studentName").value.trim();
+
+      if(!student){
+        alert("Please enter the student name before starting.");
+        return;
+      }
+
+      state = {
+        student,
+        startedAt: nowStamp(),
+        questionSet: buildQuestionSet(),
+        index:0,
+        correct:0,
+        answered:0,
+        misses:[],
+        answeredCurrent:false,
+        attemptsOnCurrent:0,
+        timerSec:0,
+        timerId:null,
+        autoAdvanceId:null
+      };
+
+      $("#tbStarted").textContent = state.startedAt;
+      showScreen("gameScreen");
+      renderQuestion();
+      startTimer();
+      saveState();
+    }
+
+    function restoreSavedGame(saved){
+      state = {
+        ...saved,
+        timerId:null,
+        autoAdvanceId:null
+      };
+      $("#studentName").value = state.student || "";
+      showScreen("gameScreen");
+      renderQuestion();
+      startTimer();
+    }
+
+    $("#startBtn").addEventListener("click", startFreshGame);
+    $("#resetSavedBtn").addEventListener("click", () => {
+      clearState();
+      alert("Saved attempt cleared.");
+    });
+    $("#restartBtn").addEventListener("click", () => {
+      if(confirm("Restart this game with a fresh shuffled run?")){
+        stopTimer();
+        clearState();
+        showScreen("startScreen");
+      }
+    });
+    $("#backBtn").addEventListener("click", goHub);
+    $("#resultsBackBtn").addEventListener("click", goHub);
+    $("#playAgainBtn").addEventListener("click", () => {
+      stopTimer();
+      showScreen("startScreen");
+    });
+
+    (() => {
+      const saved = loadState();
+      if(saved && saved.questionSet && Array.isArray(saved.questionSet) && saved.questionSet.length){
+        const resume = confirm("Resume saved attempt for Constitution Architect?");
+        if(resume){
+          restoreSavedGame(saved);
+        } else {
+          clearState();
+        }
+      }
+    })();
+  </script>
+</body>
+</html>
