@@ -37,7 +37,7 @@
     .subtitle{color:var(--muted);line-height:1.45;margin:0}
     .topbar{
       display:grid;
-      grid-template-columns:1.35fr repeat(5, minmax(110px,1fr));
+      grid-template-columns:1.5fr repeat(4, minmax(110px,1fr));
       gap:10px;
       padding:14px;
       margin-bottom:16px;
@@ -152,7 +152,7 @@
     .footBtns{display:flex;gap:10px;flex-wrap:wrap;margin-top:14px}
     .results{padding:24px}
     .scoreBig{font-size:clamp(2rem,5vw,3rem);font-weight:1000;line-height:1;margin:4px 0 8px}
-    .resultGrid{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin-top:16px}
+    .resultGrid{display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin-top:16px}
     .resultBox{
       border:1px solid var(--line);border-radius:16px;padding:14px;background:rgba(255,255,255,.04)
     }
@@ -208,7 +208,6 @@
           <div class="card" style="margin-top:14px">
             <div class="label">Student Sign In</div>
             <input id="studentName" class="input" type="text" placeholder="Student name" maxlength="40" />
-            <input id="classCard" class="input" type="text" placeholder="Class card / period" maxlength="40" />
             <div class="chips">
               <span class="chip">30 questions</span>
               <span class="chip">Shuffled order</span>
@@ -231,7 +230,7 @@
               <li>If you answer correctly, the game auto-advances.</li>
               <li>If you miss, you get a hint and must choose again.</li>
               <li>The hint helps narrow the concept, but does <strong>not</strong> reveal the answer.</li>
-              <li>Student, class card, progress, accuracy, timer, and started time stay visible during the game.</li>
+              <li>Student, progress, accuracy, timer, and started time stay visible during the game.</li>
             </ul>
           </div>
 
@@ -254,10 +253,6 @@
         <div class="stat studentCard">
           <div class="k">Student</div>
           <div class="v" id="tbStudent">—</div>
-        </div>
-        <div class="stat">
-          <div class="k">Class Card</div>
-          <div class="v" id="tbClass">—</div>
         </div>
         <div class="stat">
           <div class="k">Progress</div>
@@ -349,10 +344,6 @@
             <div class="gameName" id="resStudent">—</div>
           </div>
           <div class="resultBox">
-            <div class="label">Class Card</div>
-            <div class="gameName" id="resClass">—</div>
-          </div>
-          <div class="resultBox">
             <div class="label">Accuracy</div>
             <div class="gameName" id="resAccuracy">0%</div>
           </div>
@@ -391,7 +382,7 @@
 
   <script>
     const TOTAL_QUESTIONS = 30;
-    const STORAGE_KEY = "gov_ost_public_policy_simulator_v1";
+    const STORAGE_KEY = "gov_ost_public_policy_simulator_v2";
     const AUTO_ADVANCE_DELAY = 700;
 
     const QUESTION_BANK = [
@@ -857,7 +848,6 @@
 
     let state = {
       student:"",
-      classCard:"",
       startedAt:"",
       questionSet:[],
       index:0,
@@ -925,7 +915,6 @@
 
     function updateTopbar(){
       $("#tbStudent").textContent = state.student || "—";
-      $("#tbClass").textContent = state.classCard || "—";
       $("#tbProgress").textContent = `${state.answered} / ${TOTAL_QUESTIONS}`;
       const acc = state.answered ? Math.round((state.correct / state.answered) * 100) : 100;
       $("#tbAccuracy").textContent = `${acc}%`;
@@ -1082,7 +1071,6 @@
             : `<span class="badText">Good start.</span> Review the concepts and restart for a stronger score.`;
 
       $("#resStudent").textContent = state.student || "—";
-      $("#resClass").textContent = state.classCard || "—";
       $("#resAccuracy").textContent = `${acc}%`;
       $("#resTime").textContent = formatTime(state.timerSec);
 
@@ -1106,16 +1094,14 @@
 
     function startFreshGame(){
       const student = $("#studentName").value.trim();
-      const classCard = $("#classCard").value.trim();
 
-      if(!student || !classCard){
-        alert("Please enter both Student name and Class card before starting.");
+      if(!student){
+        alert("Please enter the student name before starting.");
         return;
       }
 
       state = {
         student,
-        classCard,
         startedAt: nowStamp(),
         questionSet: buildQuestionSet(),
         index:0,
@@ -1143,7 +1129,6 @@
         autoAdvanceId:null
       };
       $("#studentName").value = state.student || "";
-      $("#classCard").value = state.classCard || "";
       showScreen("gameScreen");
       renderQuestion();
       startTimer();
